@@ -1,0 +1,9 @@
+name: golden_times
+description: Mobil vakit hesabından (adhan_dart 2.0.1) golden vektör üretir.
+publish_to: none
+
+environment:
+  sdk: ^3.0.0
+
+dependencies:
+  adhan_dart: 2.0.1
