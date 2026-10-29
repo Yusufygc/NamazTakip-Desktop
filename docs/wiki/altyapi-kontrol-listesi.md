@@ -67,7 +67,7 @@ GitHub kullanılmayacağı için ([[kararlar]] 10) CI şimdilik yok. Aynı kapı
 
 ## Lisans ve üçüncü taraf
 
-`LICENSE` ilk gün. Qt (LGPL) için `THIRD_PARTY_NOTICES.md` üretilir ve testle `requirements.txt` sürümlerine bağlanır; kurulumla dağıtılır. `--onedir` Qt'nin yeniden bağlanabilirliğini korur ([[dagitim]]).
+`LICENSE` ilk gün. Qt (LGPL) için `THIRD_PARTY_NOTICES.md` üretilir ve testle `requirements.txt` sürümlerine bağlanır; kurulumla dağıtılır. `--onedir` Qt'nin yeniden bağlanabilirliğini korurdu; tek dosyaya geçildi, dağıtım yokken sorun değil ([[dagitim]], [[kararlar]] 27).
 
 ## Arayüz ilkeleri
 

@@ -18,7 +18,7 @@ Bu makinede (Windows 11, gerçek ekran ve gerçek sistem tepsisi) denendi:
 | Toast'ın **ekranda göründüğü**, Odaklanma Yardımı/Rahatsız Etmeyin davranışı, **bildirime tıklama** (`messageClicked`) | **Doğrulanmadı**: `showMessage` hatasız çağrıldı ama toast gözle görülmedi, tıklama elle denenmedi |
 | Gizli başlatmada kaçırılan vakit bildirimi tepsiye gider, pencere gelince "kıldınız mı" diyaloğu açılır | **Doğrulandı** (gerçek tepsi, süreç içi; bildirim başlığı tepsiye iletildi) |
 | "Vakitten önce haber" ve "işaretlenmemiş vakitler var" toast'ının ekranda görünmesi ve tıklanması | **Doğrulanmadı** (diğer toast'larla aynı yol: `showMessage`) |
-| Paketlenmiş exe ile autostart (donmuş exe yolu) | **Doğrulanmadı** (exe Faz 8'de) |
+| Paketlenmiş exe ile autostart (donmuş exe yolu) | **Doğrulandı** (Faz 8, [[dagitim]]) |
 | Uykudan dönüş, saat dilimi değişimi, birden çok monitör | **Doğrulanmadı** |
 
 ## Saat servisi (`ClockService`)

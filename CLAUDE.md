@@ -60,7 +60,8 @@ pip install -r requirements-dev.txt     # geliştirme (pytest, ruff dahil)
 python main.py                          # çalıştır
 python -m pytest                        # test
 python -m ruff check .                  # lint
-pip install -r requirements-build.txt   # exe derleme (PyInstaller)
+pip install -r requirements-build.txt   # exe derleme bağımlılığı (PyInstaller)
+python tools/build_exe.py               # dist/NamazTakip.exe (tek dosya)
 ```
 
 İlgili: `docs/wiki/index.md`
