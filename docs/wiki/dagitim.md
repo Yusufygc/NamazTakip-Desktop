@@ -15,6 +15,9 @@ Boyut: Qt yüzünden yüzlerce MB olur (P012'nin `dist` klasörü, kurulum dosya
 
 ## Kimlik ve simge
 
+`app/ui/assets/app.ico` (16–256 px, çok boyutlu) ve `tray.png` `tools/make_icons.py` ile üretilir ve depoda tutulur; PyInstaller'a `--icon app/ui/assets/app.ico` ve `app/ui/assets` veri klasörü olarak verilir (Faz 8). Autostart kaydı yalnızca donmuş exe'de yazılır; bu yüzden exe'yi kalıcı bir klasöre koyun ve ilk çalıştırmada "Evet, başlasın" deyin (kayıt her açılışta yeniden eşitlenir).
+
+
 Uygulama simgesi çok boyutlu `.ico` (16–256); tepsi simgesi ayrı küçük `.ico`. Kod imzalama yok; kişisel kullanım için bilinçli karar. Windows 11'de Akıllı Uygulama Denetimi (SAC) veya SmartScreen imzasız exe'yi engelleyebilir; bu proje için henüz denenmedi (**doğrulanmadı**). Engelleme çıkarsa P012'deki "kararlı exe" yöntemi referanstır: `C:\2UYGULAMALAR\P012-focustracker\docs\wiki\exe-dagitim-rehberi.md`.
 
 ## İleride gerekirse

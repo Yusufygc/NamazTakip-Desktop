@@ -45,6 +45,7 @@ class AppSettings:
     theme_key: str
     notifications_enabled: bool
     reminder_minutes: int
+    pre_reminder_minutes: int  # 0 = vakitten önce haber verme kapalı
     calc_method: CalcMethod
     location: "AppLocation | None"
     autostart: "bool | None"  # None: henüz sorulmadı

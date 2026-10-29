@@ -30,8 +30,15 @@ class DatabaseVersionError(RuntimeError):
 
 
 class AppDatabase:
-    def __init__(self, connection: sqlite3.Connection, corrupted_backup_path: "Path | None" = None):
+    def __init__(
+        self,
+        connection: sqlite3.Connection,
+        corrupted_backup_path: "Path | None" = None,
+        path: "Path | None" = None,
+    ):
         self.connection = connection
+        # Veritabanı dosyasının yolu; bellek içi veritabanında None (günlük yedek alınmaz).
+        self.path = path
         # Açılışta bozuk dosya yedeklenip sıfırlandıysa yedeğin tam yolu; normal açılışta None.
         self.corrupted_backup_path = corrupted_backup_path
 
@@ -45,7 +52,7 @@ class AppDatabase:
 
         db_path = Path(path) if path is not None else paths.db_path()
         if not db_path.is_file():
-            return cls(_open_connection(db_path))
+            return cls(_open_connection(db_path), path=db_path)
 
         original = db_path.read_bytes()
         if not _has_valid_header(original):
@@ -65,7 +72,7 @@ class AppDatabase:
             raise
 
         if healthy:
-            return cls(connection)
+            return cls(connection, path=db_path)
         if connection is not None:
             connection.close()
         logger.warning("Veritabanı sağlıksız, yedeklenip sıfırlanacak: %s", db_path)
@@ -86,7 +93,20 @@ class AppDatabase:
             leftover = Path(f"{db_path}{suffix}")
             if leftover.exists():
                 leftover.unlink()
-        return cls(_open_connection(db_path), corrupted_backup_path=backup)
+        return cls(_open_connection(db_path), corrupted_backup_path=backup, path=db_path)
+
+    def backup_to(self, target: Path) -> None:
+        """Veritabanının tutarlı bir kopyasını `target`a yazar (SQLite yedekleme API'si, açıkken de güvenli).
+
+        Önce `.partial` dosyasına yazılır, bitince yerine taşınır; yarım kalan yedek `target` adıyla durmaz.
+        """
+        partial = target.with_name(target.name + ".partial")
+        destination = sqlite3.connect(str(partial))
+        try:
+            self.connection.backup(destination)
+        finally:
+            destination.close()
+        partial.replace(target)
 
     def close(self) -> None:
         self.connection.close()

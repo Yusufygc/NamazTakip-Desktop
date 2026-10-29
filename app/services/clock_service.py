@@ -11,6 +11,7 @@ from enum import Enum
 from PySide6.QtCore import QObject, QTimer, Signal
 
 from app.core.domain.prayer import NextPrayer, PrayerStatus, PrayerType
+from app.core.formatters import format_time
 from app.core.logger import logger
 from app.core.strings import NotificationStrings, PrayerStrings
 from app.services.prayer_service import PrayerService
@@ -23,6 +24,7 @@ _FIRED_KEEP_DAYS = 3
 
 
 class NotificationKind(Enum):
+    PRE = "pre"  # vakit girmeden önce haber
     ADHAN = "adhan"
     REMINDER = "reminder"
 
@@ -68,6 +70,8 @@ class ClockLogic:
             return ()
 
         reminder_after = timedelta(minutes=settings.reminder_minutes)
+        pre_minutes = settings.pre_reminder_minutes
+        pre_before = timedelta(minutes=pre_minutes)
         due: list[Notification] = []
         # Dünün vakitleri de bakılır: gece yarısına yakın Yatsı bildirimi gün sınırını geçebilir.
         for calendar_day in (now.date() - timedelta(days=1), now.date()):
@@ -78,6 +82,20 @@ class ClockLogic:
             for prayer in PrayerType:
                 moment = times.time_of(prayer)
                 name = PrayerStrings.name(prayer)
+                if (
+                    pre_minutes > 0
+                    and self._in_window(now, moment - pre_before)
+                    and self._fire(calendar_day, prayer, NotificationKind.PRE)
+                ):
+                    due.append(
+                        Notification(
+                            NotificationKind.PRE,
+                            prayer,
+                            calendar_day,
+                            NotificationStrings.pre_title(name, pre_minutes),
+                            NotificationStrings.pre_body(format_time(moment)),
+                        )
+                    )
                 if self._in_window(now, moment) and self._fire(calendar_day, prayer, NotificationKind.ADHAN):
                     due.append(
                         Notification(

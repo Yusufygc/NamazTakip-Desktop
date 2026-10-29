@@ -45,6 +45,7 @@ Değerler metin olarak saklanır (bool `"1"/"0"`, JSON metin). Bozuk veya eksik 
 | `theme` | metin | `default` | `default`, `dark`, `ocean`, `rose`, `gold` ([[ekranlar]]) |
 | `notifications_enabled` | bool | `1` | Ezan bildirimi açık mı |
 | `reminder_minutes` | int | `15` | Vakitten kaç dk sonra "kıldın mı" hatırlatması |
+| `pre_reminder_minutes` | int | `40` | Vakit girmeden kaç dk önce haber; `0` = kapalı (izinli: 0, 10, 15, 20, 30, 40, 45, 60) |
 | `calc_method` | metin | `diyanet` | Anahtarlar: [[vakit-hesabi]] |
 | `manual_location` | JSON | yok | `{lat, lon, city, country}`; yoksa ana ekran "şehir seç" kartı gösterir |
 | `install_date` | metin | ilk açılış | Takip başlangıç günü; kaza bu günden başlar |
@@ -53,6 +54,7 @@ Değerler metin olarak saklanır (bool `"1"/"0"`, JSON metin). Bozuk veya eksik 
 | `autostart` | bool | yok (ilk açılışta sorulur, [[kararlar]] 12) | Windows açılışında başlat; anahtar yoksa soru gösterilir |
 | `close_to_tray` | bool | `1` | Pencereyi kapatınca tepsiye küçült ([[kararlar]] 13) |
 | `tray_hint_shown` | bool | `0` | İlk kapatmadaki "tepside çalışıyor" bilgisi gösterildi mi |
+| `last_active_at` | ISO tarih-saat (saat dilimli) | yok | Uygulamanın en son çalıştığı an (dakikada bir, kapanışta); açılışta kapalıyken kaçan vakitleri bulmak için. Saat dilimsiz veya bozuk değer yok sayılır |
 | `window_bounds` | JSON | yok | İsteğe bağlı: son pencere boyutu/konumu |
 
 Mobildeki konum modu (`auto`/`manual`) yoktur; konum her zaman `manual_location`'dır.
@@ -70,6 +72,6 @@ Mobildeki konum modu (`auto`/`manual`) yoktur; konum her zaman `manual_location`
 - Boş (0 bayt) veya 100 bayttan kısa dosya da bozuk sayılır ve yedeklenir. Başlığı geçerli ama sayfaları bozuk dosya, `integrity_check` veya okuma hatasıyla yakalanır.
 - Dosya bu uygulamadan **daha yeni** bir şema sürümüyle yazılmışsa (`user_version` > 1) bozuk sayılmaz: `DatabaseVersionError` fırlatılır ve dosyaya dokunulmaz.
 - Bağlantı otomatik commit modundadır (`isolation_level=None`); çok adımlı yazma gerekirse açık `BEGIN`/`COMMIT` kullanılır. Açılışta hata olursa bağlantı kapatılır: Windows'ta açık bağlantı dosyanın yedeklenip silinmesini engeller.
-- **Günlük yedek (v1'e dahil, henüz yazılmadı):** açılışta günde bir kez `sqlite3.Connection.backup` ile `%APPDATA%\NamazTakip\backups\namaz_takip-YYYYMMDD.db`; son 7 tutulur. Neden: yıllarca birikmiş kaza borcu ve işaretler tek dosyada; bozulma durumunda yalnızca "bozuk yedek" yetmez.
+- **Günlük yedek (yazıldı, Faz 7):** açılışta günde bir kez `sqlite3.Connection.backup` ile `%APPDATA%\NamazTakip\backups\namaz_takip-YYYYMMDD.db`; son 7 tutulur. Neden: yıllarca birikmiş kaza borcu ve işaretler tek dosyada; bozulma durumunda yalnızca "bozuk yedek" yetmez.
 - JSON dışa/içe aktarma v1 sonrası ([[yol-haritasi]]).
 - Bağlantı ana iş parçacığında kullanılır; başka iş parçacığından kullanım gerekirse ayrı bağlantı (P012 `test_database_threading_and_collation` desenine bak).

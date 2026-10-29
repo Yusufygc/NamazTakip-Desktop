@@ -49,10 +49,10 @@ P008-NamazTakip-Desktop/
       domain/                  # prayer, prayer_times, cities, dates, models, qaza (yazıldı)
       repositories/            # prayer_repository, settings_repository (yazıldı)
       strings.py  formatters.py  clock.py   # merkezi metin, saat/süre biçimi, saat kaynağı (yazıldı)
-      paths.py  logger.py  database.py  text_utils.py   # yazıldı
+      paths.py  logger.py  database.py  text_utils.py  backup.py   # yazıldı
     container.py               # bağımlılık kökü: her şeyi kurar ve bağlar (katman kuralına tabi değil)
-    services/                  # settings_service, prayer_service, qaza_service, clock_service (yazıldı)
-    bridge/                    # home_bridge, qaza_bridge, settings_bridge (yazıldı)
+    services/                  # settings, prayer, qaza, clock, autostart, single_instance, missed_prayer (yazıldı)
+    bridge/                    # home, qaza, settings, shell, missed (yazıldı)
     ui/qml/                    # Main.qml; theme/ (Theme, Icons + qmldir), components/, pages/ (HomePage, QazaPage, SettingsPage)
   tests/
     conftest.py  data/golden_times.json
@@ -67,11 +67,13 @@ Bu düzen `P012-focustracker/app/` yapısını izler; fark: alan kuralları `cor
 
 **Köprü sözleşmesi (QML'e açılan yüzey):** bridge'ler `homeBridge`, `qazaBridge`, `settingsBridge` adlarıyla `engine.rootContext()`'e eklenir (`AppContainer.register_context_properties`). Listeler `QVariantList` (sözlük listesi), özet `QVariantMap` olarak döner; metinler Python tarafında `strings.py`'dan çözülür, QML yalnızca gösterir. Durum anahtarları (`pending`, `performed`, `missed`, `compensated`) ve vakit anahtarları (`fajr`…`isha`, Güneş için `sunrise`) metin değil kimliktir; QML bunlara göre simge ve renk seçer. Ayrıntı: [[ekranlar]].
 
+**Kabuk köprüsü:** `shellBridge` (tepsi bildirimi, bildirime tıklama, gösterme ve çıkış istekleri, gizli başlatma bayrağı, tepsi simgesi adresi) QML'e `AppContainer.register_context_properties` ile açılır; `main.py` komut satırını (`--autostart`), tek örneği ve `quitRequested → app.quit` bağlantısını kurar.
+
 **QML yapısı:** `main.build_engine(container)` motoru kurar; QML `import "theme"` / `"components"` / `"pages"` dizin içe aktarmalarıyla çalışır (`theme/qmldir` iki singleton tanımlar). `Theme` singleton'ı kök bağlam özelliklerine güvenmez; seçili tema `Main.qml`'deki `Binding { target: Theme; property: "themeKey"; value: settingsBridge.themeKey }` ile verilir. Metinler singleton değil, `strings` bağlam özelliğidir (iç içe sözlük). Qt Quick Controls "Basic" stili ve özel `background`/`contentItem` kullanılır; odak halkası ve erişilebilirlik adı her etkileşimli bileşende vardır.
 
 ## Masaüstüne özgü notlar
 
 - **Saat dilimi:** `datetime.astimezone()` ile sistem saat dilimi kullanılır; ek paket gerekmez. Vakit hesabı UTC üretir, yerel saate çevrilir. **Domain'deki tüm anlar saat dilimli (aware) datetime'dır**: `now` için `datetime.now().astimezone()` kullanılır; naive ve aware karşılaştırması `TypeError` verir, bu yüzden ikisi karıştırılmaz. Takvim günleri için `datetime.date` kullanılır, gün eklemek `timedelta(days=1)` ile yapılır (yaz/kış saatinden etkilenmez).
 - **Uykudan dönüş:** Saat her tikte `datetime.now()` ile karşılaştırır, yani uyku sonrası kendiliğinden düzelir ([[bildirim-ve-tepsi]]).
-- **Tek örnek:** İkinci exe açılırsa mevcut pencereyi öne getirir (`QLockFile` + `QLocalServer`); P012'de bu yok, eklenmeli.
+- **Tek örnek:** İkinci exe açılırsa mevcut pencereyi öne getirir (`QLockFile` + `QLocalServer`, `app/services/single_instance.py`); yazıldı ve gerçek süreçlerle doğrulandı ([[bildirim-ve-tepsi]]).
 - **Pencere:** Minimum 900×600, varsayılan 1100×760; çoklu pencere yok.

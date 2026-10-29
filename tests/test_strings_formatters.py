@@ -79,6 +79,9 @@ def test_ui_metin_yer_tutuculari():
         ("qaza", "badge"): ["%1"],
         ("qaza", "confirmBody"): ["%1", "%2"],
         ("settings", "minutes"): ["%1"],
+        ("missed", "rowSemantics"): ["%1", "%2"],
+        ("tray", "nextPrayer"): ["%1", "%2"],
+        ("tray", "tooltip"): ["%1", "%2"],
         ("settings", "themeSemantics"): ["%1"],
     }
     for (group, key), placeholders in expected.items():

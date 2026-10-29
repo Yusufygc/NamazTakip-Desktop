@@ -18,6 +18,27 @@ ISTANBUL = AppLocation(41.0082, 28.9784, "İstanbul", "Türkiye")
 OCT26 = {"fajr": "05:55", "sunrise": "07:19", "dhuhr": "12:53", "asr": "15:46", "maghrib": "18:15", "isha": "19:35"}
 
 
+class FakeRegistry:
+    """Windows kayıt defteri yerine sözlük: testler gerçek `Run` anahtarına dokunmaz."""
+
+    def __init__(self, initial: "dict[str, str] | None" = None):
+        self.values: dict[str, str] = dict(initial or {})
+        self.writes = 0
+
+    def get(self, name: str) -> "str | None":
+        return self.values.get(name)
+
+    def set(self, name: str, value: str) -> None:
+        self.writes += 1
+        self.values[name] = value
+
+    def delete(self, name: str) -> bool:
+        return self.values.pop(name, None) is not None
+
+
+FAKE_EXE = r"C:\Apps\NamazTakip\NamazTakip.exe"
+
+
 def at(year, month, day, hour=0, minute=0, second=0) -> datetime:
     return datetime(year, month, day, hour, minute, second, tzinfo=TZ)
 

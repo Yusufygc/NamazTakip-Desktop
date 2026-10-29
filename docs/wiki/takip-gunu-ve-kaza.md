@@ -54,6 +54,10 @@ Tarih anahtarı ISO biçimindedir (`yyyy-MM-dd`); metin sıralaması tarih sıra
 
 "Kaza Et" → onay → `mark_compensated` → vakit listeden çıkar ve zamanında kılınmış sayılmaz. Neden türetilir: işaretlenmeyi unutulan günler otomatik kaza olsun, ayrı tablo senkron bozmasın (mobil `kararlar/005-kaza-turetilir`).
 
+## Kapalıyken kaçan vakitler ve açılış sorusu
+
+PC kapalıyken giren vakitler için kayıt yazılmaz, yani `pending` kalır. Kural yukarıdaki gibi işler: takip günü içindeyken bekleyen sayılır, gün bitince **otomatik kaza** olur ("Otomatik tespit"). Buna ek olarak açılışta uygulama kapalıyken girmiş işaretsiz vakitler için "Kıldınız mı?" diye sorulur; cevap `mark_performed` / `mark_missed` olarak yazılır. Sorunun kuralları ve sınırları: [[bildirim-ve-tepsi]] (Açılışta kaçırılan vakitler), karar: [[kararlar]] 24.
+
 ## Geçmiş yıllar kaza borcu (planlayıcı)
 
 Takip başlangıcından önceki borç ayrı bir sayaçtır ([[veri-katmani]] ayarları):

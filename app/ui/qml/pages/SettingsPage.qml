@@ -11,6 +11,11 @@ Item {
     readonly property var reminderChoices: settingsBridge.reminderChoices.map(
         function (minutes) { return { value: minutes, label: strings.settings.minutes.arg(minutes) } })
 
+    readonly property var preReminderChoices: settingsBridge.preReminderChoices.map(
+        function (minutes) {
+            return { value: minutes, label: minutes === 0 ? strings.settings.preReminderOff : strings.settings.minutes.arg(minutes) }
+        })
+
     ScrollView {
         id: scroll
         anchors.fill: parent
@@ -48,6 +53,30 @@ Item {
                         Layout.rightMargin: 14
                         Layout.bottomMargin: 14
                         spacing: 8
+
+                        Text {
+                            text: strings.settings.preReminder
+                            font.family: Theme.fontFamily
+                            font.pixelSize: 16
+                            font.weight: Font.DemiBold
+                            color: settingsBridge.notificationsEnabled ? Theme.text : Theme.textLight
+                        }
+                        Text {
+                            text: strings.settings.preReminderSubtitle
+                            font.family: Theme.fontFamily
+                            font.pixelSize: 12
+                            color: Theme.textLight
+                        }
+                        ChoiceChips {
+                            objectName: "preReminderChip"
+                            Layout.fillWidth: true
+                            Layout.topMargin: 4
+                            Layout.bottomMargin: 10
+                            choices: page.preReminderChoices
+                            current: settingsBridge.preReminderMinutes
+                            chipsEnabled: settingsBridge.notificationsEnabled
+                            onChosen: (minutes) => settingsBridge.setPreReminderMinutes(minutes)
+                        }
 
                         Text {
                             text: strings.settings.reminderDelay

@@ -48,6 +48,9 @@ Yazıldı ve testlerle ekransız doğrulandı; ekran görüntüleriyle (gerçek 
 | `components/CityPickerDialog.qml` | Arama kutusu + 81 il listesi; Yukarı/Aşağı + Enter ile seçim |
 | `components/DayNavigator.qml` | Önceki/sonraki gün, "Bugüne dön" |
 | `components/AppButton.qml`, `IconButton.qml`, `Card.qml`, `AppIcon.qml` | Ortak bileşenler (odak halkası, erişilebilirlik adı) |
+| `components/AppTrayIcon.qml` | Sistem tepsisi: ipucu, menü (Göster/Gizle, sıradaki vakit, Bildirimler Açık/Kapalı, Çıkış), bildirim (`showMessage`), ilk kapatma bilgisi, bildirime tıklama |
+| `components/MissedPrayersDialog.qml` | Açılışta "Bu vakitleri kıldınız mı?": uygulama kapalıyken giren işaretsiz vakitler, satır başına Kıldım / Kılmadım, altta Sonra ([[bildirim-ve-tepsi]]) |
+| `components/AutostartPromptDialog.qml` | İlk açılışta "Windows açılınca başlasın mı?" (Evet, başlasın / Hayır) |
 | `pages/HomePage.qml` | Vakitler sayfası (Kaza ve Ayarlar sayfaları aşağıda; geçici sayfa kaldırıldı) |
 | `theme/Theme.qml`, `theme/Icons.qml` (+ `qmldir`) | Tema singleton'ı ve merkezi ikon yolları |
 
@@ -86,7 +89,7 @@ Kart gruplarıyla tek sütun, en çok 720 px, ortalı.
 
 | Bölüm | Öğeler |
 |---|---|
-| Bildirimler | "Bildirimler" anahtarı (alt başlık: Ezan vakti ve "kıldın mı" hatırlatmaları); "Hatırlatma süresi" listesi: 5, 10, 15, 20, 30, 45, 60 dk (bildirim kapalıyken pasif) |
+| Bildirimler | "Bildirimler" anahtarı (alt başlık: Vakitten önce haber, ezan vakti ve "kıldın mı" hatırlatmaları); "Vakitten önce haber ver" listesi: Kapalı, 10, 15, 20, 30, **40**, 45, 60 dk; "Hatırlatma süresi" listesi: 5, 10, 15, 20, 30, 45, 60 dk (ikisi de bildirim kapalıyken pasif) |
 | Konum ve Vakitler | Seçili şehir ("Vakit hesabında kullanılan konum"), **Şehir seç**; "Hesaplama yöntemi" listesi (6 yöntem, adlar: [[vakit-hesabi]]) |
 | Masaüstü | "Windows açılışında başlat" anahtarı; "Pencereyi kapatınca tepsiye küçült" anahtarı |
 | Tema | 5 tema kartı: simge, ad, alt başlık, 4 renk örneği, seçili kenarlığı |
@@ -107,7 +110,7 @@ Yazıldı; `tests/test_ui_settings.py` (18 test) ve gerçek pencerede ekran gör
 
 Spesifikasyondan sapmalar: hatırlatma süresi ve hesaplama yöntemi "açılır liste" yerine düğme grubu / radyo listesi olarak yapıldı (masaüstünde tek tıkla seçim, açılır menü gerektirmez; [[kararlar]] 21). Tema kartında tema başına simge yok, renk örnekleri kimliği taşır. Alt bilgi: "Sürüm 0.1.0 • Günlük namazlarınızı kolayca takip edin" (mobildeki geliştirici adı alınmadı).
 
-**Önemli — ayar var, etki henüz yok:** "Windows açılışında başlat" ve "Pencereyi kapatınca tepsiye küçült" anahtarları yalnızca değeri saklar. Registry kaydı, tepsi ve pencere davranışı Faz 7'dedir ([[bildirim-ve-tepsi]]); ilk açılışta autostart sorusu da orada gelecek ([[kararlar]] 12). "Bildirimler" anahtarı ve hatırlatma süresi saat servisinin kararını gerçekten etkiler (testle doğrulandı), ancak bildirimin ekranda gösterimi de Faz 7'dedir.
+**Masaüstü anahtarlarının etkisi (Faz 7'de bağlandı):** "Windows açılışında başlat" Run kaydını yazar/siler (yalnızca paketlenmiş exe'de, [[kararlar]] 23); "Pencereyi kapatınca tepsiye küçült" kapat düğmesinin davranışını belirler (tepsi varsa); "Bildirimler" ve hatırlatma süresi saat servisinin kararını belirler. Ayrıntı ve doğrulama durumu: [[bildirim-ve-tepsi]].
 
 **Şehir seçici:** arama kutusu (otomatik odak), 81 ilin listesi, Türkçe duyarsız arama (`fold_turkish`: "istanbul", "Şanlıurfa", "igdir" eşleşir). Seçince vakitler yeniden hesaplanır. İlk açılışta zorunlu gösterilir; varsayılan öneri İstanbul.
 

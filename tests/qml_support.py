@@ -3,14 +3,15 @@
 import re
 from types import SimpleNamespace
 
-from PySide6.QtCore import QObject, QtMsgType, qInstallMessageHandler
+from PySide6.QtCore import QCoreApplication, QEvent, QObject, QtMsgType, qInstallMessageHandler
 from PySide6.QtQml import QQmlExpression
 from PySide6.QtQuick import QQuickWindow
 from shiboken6 import getCppPointer, wrapInstance
 
 from app.container import AppContainer
 from app.core.database import AppDatabase
-from tests.support import ISTANBUL, FakeClock, at
+from app.services.autostart_service import AutostartService
+from tests.support import FAKE_EXE, ISTANBUL, FakeClock, FakeRegistry, at
 
 _PROBLEM_TYPES = (QtMsgType.QtWarningMsg, QtMsgType.QtCriticalMsg, QtMsgType.QtFatalMsg)
 # Font ve platform uyarıları arayüz hatası değildir; QML/bağlama hataları böyle görünür.
@@ -37,11 +38,14 @@ class QmlMessages:
         ]
 
 
-def load_ui(qapp, with_location: bool = True, now=None, installed=None) -> SimpleNamespace:
+def load_ui(
+    qapp, with_location: bool = True, now=None, installed=None, start_hidden: bool = False, last_active=None
+) -> SimpleNamespace:
     """Gerçek Main.qml'i bellek içi veritabanı ve sahte saatle yükler.
 
     `installed` verilirse uygulama o anda ilk kez açılmış gibi kurulur (takip başlangıcı o gündür), sonra
-    saat `now`a alınır; böylece geçmiş günler kaza listesine düşer.
+    saat `now`a alınır; böylece geçmiş günler kaza listesine düşer. `last_active` verilirse uygulama o anda
+    kapanmış gibi kurulur ve açılış sorusu için kaçırılan vakitler yüklenir.
     """
     import main  # kök dizindeki main.py
 
@@ -49,12 +53,17 @@ def load_ui(qapp, with_location: bool = True, now=None, installed=None) -> Simpl
     qInstallMessageHandler(messages)
     now = now or at(2026, 10, 26, 12)
     clock = FakeClock(installed or now)
-    container = AppContainer(AppDatabase.open_in_memory(), now=clock)
+    registry = FakeRegistry()  # gerçek Run anahtarına dokunulmaz
+    autostart = AutostartService(registry, lambda: FAKE_EXE)
+    container = AppContainer(AppDatabase.open_in_memory(), now=clock, start_hidden=start_hidden, autostart=autostart)
     clock.set(now)
     if with_location:
         container.settings_service.use_manual_location(ISTANBUL)
         container.home_bridge.refresh()
         container.qaza_bridge.refresh()
+    if last_active is not None:
+        container.settings_service.set_last_active_at(last_active)
+        container.missed_bridge.load()
     engine = main.build_engine(container)
     qapp.processEvents()
     roots = engine.rootObjects()
@@ -62,6 +71,7 @@ def load_ui(qapp, with_location: bool = True, now=None, installed=None) -> Simpl
         qapp=qapp,
         messages=messages,
         clock=clock,
+        registry=registry,
         container=container,
         engine=engine,
         root=roots[0] if roots else None,
@@ -70,6 +80,9 @@ def load_ui(qapp, with_location: bool = True, now=None, installed=None) -> Simpl
 
 def close_ui(ui) -> None:
     ui.engine.deleteLater()
+    # `processEvents` ertelenmiş silmeleri işlemez; motor sonraki testin sırasında çöp toplayıcıyla yıkılıp
+    # o testin Qt mesajlarına karışmasın diye silmeyi burada tamamla.
+    QCoreApplication.sendPostedEvents(None, QEvent.Type.DeferredDelete)
     ui.qapp.processEvents()
     ui.container.shutdown()
     qInstallMessageHandler(None)

@@ -9,7 +9,7 @@ from PySide6.QtCore import Property, QObject, Signal, Slot
 from app.core.domain.prayer_times import CalcMethod
 from app.core.logger import logger
 from app.core.strings import CalcMethodStrings
-from app.services.settings_service import REMINDER_CHOICES, THEME_KEYS, SettingsService
+from app.services.settings_service import PRE_REMINDER_CHOICES, REMINDER_CHOICES, THEME_KEYS, SettingsService
 
 
 class SettingsBridge(QObject):
@@ -42,6 +42,14 @@ class SettingsBridge(QObject):
     @Property("QVariantList", constant=True)
     def reminderChoices(self) -> list:
         return list(REMINDER_CHOICES)
+
+    @Property(int, notify=settingsChanged)
+    def preReminderMinutes(self) -> int:
+        return self._settings.settings.pre_reminder_minutes
+
+    @Property("QVariantList", constant=True)
+    def preReminderChoices(self) -> list:
+        return list(PRE_REMINDER_CHOICES)
 
     @Property(str, notify=settingsChanged)
     def calcMethodKey(self) -> str:
@@ -89,6 +97,10 @@ class SettingsBridge(QObject):
     @Slot(int, result=bool)
     def setReminderMinutes(self, minutes: int) -> bool:
         return self._apply(lambda: self._settings.set_reminder_minutes(minutes))
+
+    @Slot(int, result=bool)
+    def setPreReminderMinutes(self, minutes: int) -> bool:
+        return self._apply(lambda: self._settings.set_pre_reminder_minutes(minutes))
 
     @Slot(str, result=bool)
     def setCalcMethod(self, key: str) -> bool:

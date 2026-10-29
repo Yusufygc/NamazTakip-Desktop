@@ -87,6 +87,27 @@ class NotificationStrings:
 
     REMINDER_BODY = "Namazınızı işaretlemek için dokunun."
 
+    @staticmethod
+    def pre_title(prayer_name: str, minutes: int) -> str:
+        return f"{prayer_name} vaktine {minutes} dk kaldı"
+
+    @staticmethod
+    def pre_body(time_text: str) -> str:
+        return f"Vakit girişi: {time_text}"
+
+
+class MissedStrings:
+    """Açılışta "uygulama kapalıyken giren vakitleri kıldınız mı?" diyaloğu ve gizli başlatma bildirimi."""
+
+    NOTIFICATION_TITLE = "İşaretlenmemiş vakitler var"
+    NOTIFICATION_BODY = "Uygulama kapalıyken giren vakitleri işaretlemek için dokunun."
+    TITLE = "Bu vakitleri kıldınız mı?"
+    BODY = "Uygulama kapalıyken şu vakitler girdi. İşaretlemezseniz gün bitince kaza listesine düşer."
+    PERFORMED = "Kıldım"
+    MISSED = "Kılmadım"
+    LATER = "Sonra"
+    ROW_SEMANTICS = "%1 namazı, %2"
+
 
 class QazaStrings:
     """Kaza ekranı ve geçmiş borç planlayıcı. `%1`, `%2` yer tutucularını QML `.arg()` doldurur."""
@@ -129,7 +150,10 @@ class SettingsStrings:
 
     SECTION_NOTIFICATIONS = "Bildirimler"
     NOTIFICATIONS = "Bildirimler"
-    NOTIFICATIONS_SUBTITLE = 'Ezan vakti ve "kıldın mı" hatırlatmaları'
+    NOTIFICATIONS_SUBTITLE = 'Vakitten önce haber, ezan vakti ve "kıldın mı" hatırlatmaları'
+    PRE_REMINDER = "Vakitten önce haber ver"
+    PRE_REMINDER_SUBTITLE = "Yeni vakit girmeden kaç dakika önce"
+    PRE_REMINDER_OFF = "Kapalı"
     REMINDER_DELAY = "Hatırlatma süresi"
     REMINDER_DELAY_SUBTITLE = "Ezandan kaç dakika sonra"
     MINUTES = "%1 dk"
@@ -155,6 +179,36 @@ class SettingsStrings:
         "rose": ("Gül Kurusu", "Bordo & Gül"),
         "gold": ("Altın", "Tezhip Altını"),
     }
+
+
+class TrayStrings:
+    """Sistem tepsisi menüsü, ipucu ve ilk kapatma bilgisi. `%1`, `%2` yer tutucularını QML `.arg()` doldurur."""
+
+    SHOW = "Göster"
+    HIDE = "Gizle"
+    NEXT_PRAYER = "Sıradaki: %1 %2"
+    NOTIFICATIONS_ON = "Bildirimler: Açık"
+    NOTIFICATIONS_OFF = "Bildirimler: Kapalı"
+    QUIT = "Çıkış"
+    TOOLTIP = "Namaz Takip  •  Sıradaki: %1 %2"
+    TOOLTIP_IDLE = "Namaz Takip"
+    HINT_TITLE = "Namaz Takip tepside çalışıyor"
+    HINT_BODY = (
+        "Pencereyi kapattınız; uygulama arka planda çalışmaya devam eder ve vakit bildirimlerini gösterir. "
+        "Tamamen kapatmak için tepsi simgesinden Çıkış'ı seçin."
+    )
+
+
+class AutostartPromptStrings:
+    """İlk açılışta "Windows açılınca başlasın mı?" sorusu."""
+
+    TITLE = "Windows açılınca başlasın mı?"
+    BODY = (
+        "Vakit bildirimlerinin gelmesi için uygulamanın bilgisayar açıldığında tepside çalışması gerekir. "
+        "Bunu sonradan Ayarlar'dan değiştirebilirsiniz."
+    )
+    YES = "Evet, başlasın"
+    NO = "Hayır"
 
 
 class NavStrings:
@@ -287,6 +341,9 @@ def ui_strings() -> dict:
             "sectionNotifications": SettingsStrings.SECTION_NOTIFICATIONS,
             "notifications": SettingsStrings.NOTIFICATIONS,
             "notificationsSubtitle": SettingsStrings.NOTIFICATIONS_SUBTITLE,
+            "preReminder": SettingsStrings.PRE_REMINDER,
+            "preReminderSubtitle": SettingsStrings.PRE_REMINDER_SUBTITLE,
+            "preReminderOff": SettingsStrings.PRE_REMINDER_OFF,
             "reminderDelay": SettingsStrings.REMINDER_DELAY,
             "reminderDelaySubtitle": SettingsStrings.REMINDER_DELAY_SUBTITLE,
             "minutes": SettingsStrings.MINUTES,
@@ -302,6 +359,34 @@ def ui_strings() -> dict:
             "sectionTheme": SettingsStrings.SECTION_THEME,
             "themeSemantics": SettingsStrings.THEME_SEMANTICS,
             "themes": {key: {"name": name, "subtitle": subtitle} for key, (name, subtitle) in SettingsStrings.THEMES.items()},
+        },
+        "tray": {
+            "show": TrayStrings.SHOW,
+            "hide": TrayStrings.HIDE,
+            "nextPrayer": TrayStrings.NEXT_PRAYER,
+            "notificationsOn": TrayStrings.NOTIFICATIONS_ON,
+            "notificationsOff": TrayStrings.NOTIFICATIONS_OFF,
+            "quit": TrayStrings.QUIT,
+            "tooltip": TrayStrings.TOOLTIP,
+            "tooltipIdle": TrayStrings.TOOLTIP_IDLE,
+            "hintTitle": TrayStrings.HINT_TITLE,
+            "hintBody": TrayStrings.HINT_BODY,
+        },
+        "autostart": {
+            "title": AutostartPromptStrings.TITLE,
+            "body": AutostartPromptStrings.BODY,
+            "yes": AutostartPromptStrings.YES,
+            "no": AutostartPromptStrings.NO,
+        },
+        "missed": {
+            "notificationTitle": MissedStrings.NOTIFICATION_TITLE,
+            "notificationBody": MissedStrings.NOTIFICATION_BODY,
+            "title": MissedStrings.TITLE,
+            "body": MissedStrings.BODY,
+            "performed": MissedStrings.PERFORMED,
+            "missed": MissedStrings.MISSED,
+            "later": MissedStrings.LATER,
+            "rowSemantics": MissedStrings.ROW_SEMANTICS,
         },
         "location": {
             "needed": LocationStrings.NEEDED,

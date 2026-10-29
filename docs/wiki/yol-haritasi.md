@@ -11,7 +11,7 @@ Aşamalar sırayla yapılır; her aşamanın sonunda `ruff` temiz ve `pytest` ye
 | **4** Vakitler ekranı (**tamam**, 2026-10-30) | Şehir seçici, geri sayım, 6 vakit, işaretleme diyaloğu, geçmiş gün gezinme, tema altyapısı, motif yöntemi seçimi | Namaz işaretlenir, yeniden açılışta kalır |
 | **5** Kaza ekranı (**tamam**, 2026-10-30) | Liste, Kaza Et, borç planlayıcı, hedef ve tahmini bitiş | "2 gün × 5 = 10 kaza" senaryosu aynı sonucu verir |
 | **6** Ayarlar (**tamam**, 2026-10-30) | Bildirim, hatırlatma, şehir, yöntem, 5 tema, masaüstü anahtarları | Tüm ayarlar yeniden açılışta korunur |
-| **7** Masaüstü katmanı | Bildirim, tepsi, pencere davranışı, autostart, tek örnek, günlük yedek | Elle kontrol listesi geçer ([[dagitim]]) |
+| **7** Masaüstü katmanı (**tamam**, 2026-10-30; toast gözle görülmedi) | Bildirim, tepsi, pencere davranışı, autostart, tek örnek, günlük yedek | Elle kontrol listesi geçer ([[dagitim]]) |
 | **8** Paketleme | Simge, sürüm, `--onedir` çıktısı, zip, wiki ve log | Temiz bir klasörde exe çalışır |
 
 **Durum (2026-10-29):** Faz 0'dan `venv` (Python 3.10.11), `requirements*.txt` ve araç kurulumu (PySide6, adhanpy, pytest, ruff, PyInstaller) tamam. adhanpy'nin Diyanet çıktısı `adhan_dart` ile 3 tarihte karşılaştırıldı ([[vakit-hesabi]]). Sonra yapıldı (aynı gün): `git init` (dal `main`, commit yok), `.gitignore`/`.gitattributes`/`.editorconfig`, `ruff.toml`, `pytest.ini`, `tests/conftest.py` (veri yalıtımı), `app/core/paths.py` ve `logger.py`, `main.py` + boş `Main.qml` penceresi (900×600 minimum, başlık uygulama adı), bekçi testleri (BOM, sessiz `except`, domain'de Qt yok, `sqlite3` yalnız veri katmanında), `test_wiki`, `test_logger`, `test_main`. `ruff` temiz, 15 test geçiyor (`PYTHONWARNDEFAULTENCODING=1` ile de); `python main.py` ekransız 4 sn çalıştı ve log yazdı. Kalanlar: tepsi simgesi + `showMessage` denemesi (simge dosyası gerekir), `LICENSE`/`THIRD_PARTY_NOTICES` (şimdilik gerekmiyor, kişisel kullanım).
@@ -26,10 +26,14 @@ Aşamalar sırayla yapılır; her aşamanın sonunda `ruff` temiz ve `pytest` ye
 
 **Faz 6 (2026-10-30):** `pages/SettingsPage.qml` ve `SettingsSection`, `SwitchRow`, `ChoiceChips`, `RadioRow`, `ThemeCard`; `strings.settings`; geçici `PlaceholderPage` silindi. 278 test, `ruff` temiz; ayarların dosyalı veritabanında kalıcılığı Faz 2 testleriyle, arayüzden yazılması Faz 6 testleriyle doğrulandı (uygulamayı elle kapatıp açma denenmedi). Faz 1–5 beş commit olarak kaydedildi (`git log`). Sırada: Faz 7 (masaüstü katmanı: bildirim gösterimi, tepsi, pencere davranışı, autostart, tek örnek, günlük yedek). Autostart ve tepsi anahtarları şimdilik etkisizdir.
 
+**Faz 7 (2026-10-30):** `AppTrayIcon.qml`, `AutostartPromptDialog.qml`, `Main.qml` (kapatma, gizli başlatma, bildirim tıklaması); `shell_bridge`, `autostart_service`, `single_instance`, `core/backup.py` (+ `AppDatabase.backup_to`); `tools/make_icons.py` ve `app/ui/assets/` (`app.ico`, `tray.png`); `main.py` tek örnek ve `--autostart`; `SettingsService` autostart kaydını yönetir. 340 test, `ruff` temiz. Gerçek Windows'ta tepsi, kapatma, tek örnek, gizli başlatma ve Run kaydı doğrulandı. **Açık kalanlar:** (1) toast'ın ekranda görünmesi ve bildirime fiilen tıklanması elle denenmedi; (2) paketlenmiş exe ile autostart Faz 8'de; (3) bozuk veritabanı uyarı diyaloğu (`corrupted_db_backup` ayarı yazılıyor ama arayüzde gösterilmiyor) yazılmadı; (4) uykudan dönüş denenmedi. Sırada: Faz 8 (paketleme).
+
+**Faz 7 eki (2026-10-30):** kullanıcı isteğiyle iki özellik eklendi: vakitten önce haber (`PRE`, varsayılan 40 dk, ayarlanabilir) ve açılışta kapalıyken kaçan vakitler için "kıldınız mı" diyaloğu (`MissedPrayerService`, `MissedBridge`, `MissedPrayersDialog`, `last_active_at`). 389 test, `ruff` temiz; gerçek tepsiyle gizli başlatma bildirimi ve diyalog doğrulandı. Toast'ların ekranda görünmesi hâlâ elle denenmedi.
+
 ## Riskler
 
 1. **Vakit doğruluğu (en büyük risk).** Python portu mobille aynı sonucu vermezse güvenilmez olur. Golden test bu yüzden Faz 1'dedir. Ayrıca resmî Diyanet tablosuyla birebir karşılaştırma yapılmamıştır; fark en çok ~2 dk ([[vakit-hesabi]]).
-2. **Bildirim güvenilirliği.** `showMessage` toast'ı Windows sürümüne ve Odaklanma ayarlarına bağlı olabilir; doğrulanmadı ([[bildirim-ve-tepsi]]). Faz 0 denemesi bu yüzden erkene alındı.
+2. **Bildirim güvenilirliği.** `showMessage` hatasız çağrılıyor ve tepsi var, ama toast'ın ekranda görünmesi, Odaklanma/Rahatsız Etmeyin davranışı ve tıklama elle denenmedi ([[bildirim-ve-tepsi]]).
 3. **QML arayüzün sıfırdan yazımı.** 5 tema, Selçuklu motifleri ve mihrap zemini en çok emek isteyen kısım ([[ekranlar]]).
 4. **Türkçe büyük/küçük harf** hataları ([[ekranlar]], [[test-stratejisi]]).
 5. **Paket boyutu ve SAC.** Qt'li exe büyüktür; imzasız exe SAC'a takılabilir ([[dagitim]]).

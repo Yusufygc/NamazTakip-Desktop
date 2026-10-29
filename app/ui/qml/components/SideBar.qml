@@ -78,23 +78,26 @@ Rectangle {
                     }
                 }
 
-                contentItem: Column {
-                    spacing: 4
-                    anchors.centerIn: parent
+                // Düğme contentItem'ın konumunu kendisi belirler; Column'u doğrudan çapalamak kaydırıyordu.
+                contentItem: Item {
+                    Column {
+                        spacing: 4
+                        anchors.centerIn: parent
 
-                    AppIcon {
-                        anchors.horizontalCenter: parent.horizontalCenter
-                        name: navItem.modelData.icon
-                        size: 24
-                        color: navItem.selected ? Theme.primary : Theme.textLight
-                    }
-                    Text {
-                        anchors.horizontalCenter: parent.horizontalCenter
-                        text: navItem.modelData.label
-                        font.family: Theme.fontFamily
-                        font.pixelSize: 12
-                        font.weight: navItem.selected ? Font.Bold : Font.Medium
-                        color: navItem.selected ? Theme.text : Theme.textLight
+                        AppIcon {
+                            anchors.horizontalCenter: parent.horizontalCenter
+                            name: navItem.modelData.icon
+                            size: 24
+                            color: navItem.selected ? Theme.primary : Theme.textLight
+                        }
+                        Text {
+                            anchors.horizontalCenter: parent.horizontalCenter
+                            text: navItem.modelData.label
+                            font.family: Theme.fontFamily
+                            font.pixelSize: 12
+                            font.weight: navItem.selected ? Font.Bold : Font.Medium
+                            color: navItem.selected ? Theme.text : Theme.textLight
+                        }
                     }
                 }
             }

@@ -6,7 +6,7 @@ Kaynak: mobil `settings_repository.dart` (2026-10-29). Anahtarlar: docs/wiki/ver
 """
 
 import json
-from datetime import date
+from datetime import date, datetime
 
 from app.core.database import AppDatabase
 from app.core.domain.dates import date_key, parse_date_key
@@ -32,9 +32,12 @@ KEY_QAZA_DAILY_TARGET = "qaza_daily_target"
 KEY_AUTOSTART = "autostart"
 KEY_CLOSE_TO_TRAY = "close_to_tray"
 KEY_TRAY_HINT_SHOWN = "tray_hint_shown"
+KEY_PRE_REMINDER_MINUTES = "pre_reminder_minutes"
+KEY_LAST_ACTIVE_AT = "last_active_at"
 
 DEFAULT_THEME = "default"
 DEFAULT_REMINDER_MINUTES = 15
+DEFAULT_PRE_REMINDER_MINUTES = 40  # 0 = kapalı
 
 
 class SettingsRepository:
@@ -102,6 +105,14 @@ class SettingsRepository:
     def set_reminder_minutes(self, value: int) -> None:
         self._set(KEY_REMINDER_MINUTES, str(value))
 
+    @property
+    def pre_reminder_minutes(self) -> int:
+        """Vakit girmeden kaç dakika önce haber verilsin; 0 = kapalı."""
+        return self._get_int(KEY_PRE_REMINDER_MINUTES, DEFAULT_PRE_REMINDER_MINUTES)
+
+    def set_pre_reminder_minutes(self, value: int) -> None:
+        self._set(KEY_PRE_REMINDER_MINUTES, str(value))
+
     # ---- Konum ve yöntem ----------------------------------------------------------
 
     @property
@@ -144,6 +155,24 @@ class SettingsRepository:
         """İlk kullanım gününü yazar ve bir daha değiştirmez; kaza hesabı bu günden başlar."""
         if self._get(KEY_INSTALL_DATE) is None:
             self._set(KEY_INSTALL_DATE, date_key(day))
+
+    @property
+    def last_active_at(self) -> "datetime | None":
+        """Uygulamanın en son çalıştığı an (dakikada bir yazılır). Açılışta kaçırılan vakitleri bulmak için."""
+        raw = self._get(KEY_LAST_ACTIVE_AT)
+        if raw is None:
+            return None
+        try:
+            value = datetime.fromisoformat(raw)
+        except ValueError:
+            value = None
+        if value is None or value.tzinfo is None:
+            logger.warning("Ayar %s okunamadı: %r", KEY_LAST_ACTIVE_AT, raw)
+            return None
+        return value
+
+    def set_last_active_at(self, value: datetime) -> None:
+        self._set(KEY_LAST_ACTIVE_AT, value.isoformat())
 
     # ---- Bozuk veritabanı uyarısı -------------------------------------------------
 

@@ -1,21 +1,25 @@
 """Ayar servisi: doğrulama ve şehir arama. Qt içe aktarmaz."""
 
-from datetime import date
+from datetime import date, datetime
 
 from app.core.domain.cities import CITIES
 from app.core.domain.models import AppSettings
 from app.core.domain.prayer import PrayerType
 from app.core.domain.prayer_times import AppLocation, CalcMethod
 from app.core.repositories.settings_repository import SettingsRepository
+from app.core.logger import logger
 from app.core.text_utils import fold_turkish
+from app.services.autostart_service import AutostartService
 
 THEME_KEYS = ("default", "dark", "ocean", "rose", "gold")
 REMINDER_CHOICES = (5, 10, 15, 20, 30, 45, 60)
+PRE_REMINDER_CHOICES = (0, 10, 15, 20, 30, 40, 45, 60)  # 0 = kapalı
 
 
 class SettingsService:
-    def __init__(self, repository: SettingsRepository):
+    def __init__(self, repository: SettingsRepository, autostart: "AutostartService | None" = None):
         self._repo = repository
+        self._autostart = autostart
 
     @property
     def settings(self) -> AppSettings:
@@ -23,6 +27,7 @@ class SettingsService:
             theme_key=self._repo.theme_key,
             notifications_enabled=self._repo.notifications_enabled,
             reminder_minutes=self._repo.reminder_minutes,
+            pre_reminder_minutes=self._repo.pre_reminder_minutes,
             calc_method=self._repo.calc_method,
             location=self._repo.manual_location,
             autostart=self._repo.autostart,
@@ -75,6 +80,20 @@ class SettingsService:
             raise ValueError(f"Geçersiz hatırlatma süresi: {minutes!r} (izinli: {REMINDER_CHOICES})")
         self._repo.set_reminder_minutes(minutes)
 
+    def set_pre_reminder_minutes(self, minutes: int) -> None:
+        if minutes not in PRE_REMINDER_CHOICES:
+            raise ValueError(f"Geçersiz ön hatırlatma süresi: {minutes!r} (izinli: {PRE_REMINDER_CHOICES})")
+        self._repo.set_pre_reminder_minutes(minutes)
+
+    # ---- Son çalışma anı (açılışta kaçırılan vakitler için) --------------------------
+
+    @property
+    def last_active_at(self) -> "datetime | None":
+        return self._repo.last_active_at
+
+    def set_last_active_at(self, moment: datetime) -> None:
+        self._repo.set_last_active_at(moment)
+
     # ---- Masaüstü -----------------------------------------------------------------
 
     @property
@@ -83,7 +102,23 @@ class SettingsService:
         return self._repo.autostart is None
 
     def set_autostart(self, enabled: bool) -> None:
+        """Ayarı saklar ve Windows kaydını uyumlu hale getirir. Kayıt hatası ayarı geri almaz, loglanır."""
         self._repo.set_autostart(enabled)
+        if self._autostart is None:
+            return
+        try:
+            self._autostart.apply(enabled)
+        except OSError:
+            logger.exception("Autostart kaydı güncellenemedi")
+
+    def sync_autostart(self) -> None:
+        """Açılışta kaydı ayarla uyumlu tutar (klasör taşınmış olabilir). Henüz sorulmadıysa bir şey yapmaz."""
+        if self._autostart is None:
+            return
+        try:
+            self._autostart.sync(self._repo.autostart)
+        except OSError:
+            logger.exception("Autostart kaydı eşitlenemedi")
 
     def set_close_to_tray(self, enabled: bool) -> None:
         self._repo.set_close_to_tray(enabled)

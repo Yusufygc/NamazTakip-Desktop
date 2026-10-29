@@ -18,8 +18,21 @@ Item {
         return count
     }
 
+    signal cityPickerClosed()
+
     function openCityPicker() {
         cityPicker.open()
+    }
+
+    // Bildirimden gelen istek: o vaktin işaretleme diyaloğunu aç (gün önce `homeBridge.openDay` ile seçilir).
+    function promptPrayer(prayerKey) {
+        for (var i = 0; i < rows.length; ++i) {
+            if (rows[i].key === prayerKey && rows[i].markable) {
+                prayerDialog.openFor(rows[i])
+                return true
+            }
+        }
+        return false
     }
 
     Item {
@@ -148,5 +161,5 @@ Item {
     }
 
     PrayerDialog { id: prayerDialog }
-    CityPickerDialog { id: cityPicker }
+    CityPickerDialog { id: cityPicker; onClosed: page.cityPickerClosed() }
 }
