@@ -48,7 +48,7 @@ Mobil Namaz Takip uygulamasının **basit bir Windows masaüstü sürümü**: ez
 
 ## Çalışma Düzeni
 
-Büyük işte önce plan, onaydan sonra uygula; çok aşamalı işte her aşamada rapor verip dur. Commit yalnızca "commit at" denince, etiket (tag) yalnızca açık istekle. Doğrulanamayanı "doğrulanmadı" de. Ayrıntı: [[calisma-duzeni]]. Kod değişikliğiyle wiki güncellemesi aynı turda yapılır.
+Büyük işte önce plan, onaydan sonra uygula; çok aşamalı işte her aşamada rapor verip dur. Commit yalnızca "commit at" denince, etiket (tag) yalnızca açık istekle; commit mesajına yapay zekâ `Co-Authored-By` satırı eklenmez (repo public, contributors listesinde yalnızca sahibi görünür). Doğrulanamayanı "doğrulanmadı" de. Ayrıntı: [[calisma-duzeni]]. Kod değişikliğiyle wiki güncellemesi aynı turda yapılır.
 
 ## Komutlar
 

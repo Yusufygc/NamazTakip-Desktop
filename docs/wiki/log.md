@@ -2,6 +2,9 @@
 
 Kronolojik kayıt, en yeni üstte. Biçim: `## [YYYY-AA-GG] [İŞLEM_TİPİ] | Kısa açıklama`.
 
+## [2026-10-30] INGEST | README, ekran görüntüleri ve geçmiş temizliği
+README baştan yazıldı: tanıtım, özellikler, 6 ekran görüntüsü (`docs/screenshots/`), kullanım, kurulum, exe üretme, veri konumu, nasıl çalışıyor, sınırlar. Public repo taraması: sır, veri dosyası, kullanıcı yolu yok; commit e-postası görünür (uyarıldı). Kullanıcı isteğiyle son iki commit'ten Claude `Co-Authored-By` satırı kaldırıldı (geçmiş yeniden yazıldı, force push gerekir); `CLAUDE.md`'ye kural eklendi. Test dersi: `grabWindow()` ikinci çağrıda Shape ikonlarını çizmiyor ([[test-stratejisi]]).
+
 ## [2026-10-30] INGEST | Faz 8 eki: tek dosya exe
 Kullanıcı `_internal` klasörü istemedi, exe'yi istediği yerden açmak istedi. `--onedir` yerine tek dosya: `tools/build_exe.py` artık spec üretir, Qt süzmesi spec içinde (`is_unused`); çıktı `dist/NamazTakip.exe` 56 MB. Proje dışı klasöre kopyalanıp denendi: pencere, tek örnek, `--autostart` gizli başlatma, Run kaydı (değer sonra silindi) geçti; pencere ~3,4 sn'de açılıyor (paket her açılışta `%TEMP%`'e açılır). Test dersi: tek dosyada `Popen.kill()` yalnızca başlatıcıyı öldürür, `taskkill /F /T` gerekir (yoksa kalan süreç sonraki denemeleri bozar). Karar 27. Ayrıntı: [[dagitim]], [[kararlar]], [[yol-haritasi]], [[test-stratejisi]].
 

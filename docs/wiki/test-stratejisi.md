@@ -4,6 +4,8 @@ Araç: `pytest`. Kurulum ve yalıtım: [[altyapi-kontrol-listesi]]. Kural kaynak
 
 ## Durum (2026-10-30)
 
+**Ekran görüntüsü notu:** `QQuickWindow.grabWindow()` aynı pencerede **ikinci** çağrıda `Shape` (CurveRenderer) ikonlarını çizmez; durum değişmese de ikon pikselleri kaybolur (ölçüldü: 92 → 0). Uygulama hatası değil, yakalama davranışıdır. Çoklu görüntü gerekirse her görüntü için yeni pencere kurulur. README görüntüleri `docs/screenshots/` altındadır ve bu yöntemle üretilir (gerçek QML, örnek veri).
+
 **Tek dosya exe sonrası: 426 test** (`test_build_exe` spec üretimi, süzme kuralları ve kullanılan Qt yollarının süzülmediğini sınar). Gerçek derleme ve exe denemesi elle yapılır ([[dagitim]]).
 
 **Faz 8 sonrası: 394 test**, `ruff` temiz. `test_build_exe` PyInstaller komutunu (bayraklar, simge, veri yolları) ve ayıklama kurallarını sınar; gerçek derleme ve exe denemesi elle yapılır ([[dagitim]]). Kenar çubuğu ortalaması için `test_ui_shell` içinde ölçüm testi var (içerik kutunun tam ortasında; eski sürümde kırılır). Exe denemesinde ekran görüntüsü `QScreen.grabWindow(hwnd)` ile alındı.
