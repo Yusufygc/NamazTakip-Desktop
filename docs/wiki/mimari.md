@@ -53,7 +53,7 @@ P008-NamazTakip-Desktop/
     container.py               # bağımlılık kökü: her şeyi kurar ve bağlar (katman kuralına tabi değil)
     services/                  # settings_service, prayer_service, qaza_service, clock_service (yazıldı)
     bridge/                    # home_bridge, qaza_bridge, settings_bridge (yazıldı)
-    ui/qml/                    # Main.qml; theme/ (Theme, Icons + qmldir), components/, pages/ (HomePage yazıldı; Kaza, Ayarlar sırada)
+    ui/qml/                    # Main.qml; theme/ (Theme, Icons + qmldir), components/, pages/ (HomePage, QazaPage, SettingsPage)
   tests/
     conftest.py  data/golden_times.json
   tools/                       # release, simge üretimi

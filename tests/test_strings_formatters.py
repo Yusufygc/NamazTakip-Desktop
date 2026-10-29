@@ -78,6 +78,8 @@ def test_ui_metin_yer_tutuculari():
         ("qaza", "remainingPrayerCount"): ["%1"],
         ("qaza", "badge"): ["%1"],
         ("qaza", "confirmBody"): ["%1", "%2"],
+        ("settings", "minutes"): ["%1"],
+        ("settings", "themeSemantics"): ["%1"],
     }
     for (group, key), placeholders in expected.items():
         assert all(p in ui[group][key] for p in placeholders), (group, key)
@@ -85,6 +87,15 @@ def test_ui_metin_yer_tutuculari():
     for path, value in _leaves(ui):
         if path not in {f"{g}.{k}" for g, k in expected}:
             assert "%" not in value, path
+
+
+def test_her_temanin_adi_ve_alt_basligi_var():
+    from app.services.settings_service import THEME_KEYS
+
+    themes = ui_strings()["settings"]["themes"]
+    assert sorted(themes) == sorted(THEME_KEYS)
+    assert all(t["name"].strip() and t["subtitle"].strip() for t in themes.values())
+    assert len({t["name"] for t in themes.values()}) == len(THEME_KEYS)
 
 
 def test_diyalog_basligi_turkce_buyuk_harf():

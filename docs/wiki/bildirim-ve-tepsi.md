@@ -29,6 +29,10 @@ Plan: `Qt.labs.platform.SystemTrayIcon.showMessage(başlık, metin)` ve `message
 - Eylem düğmesi ("Kıldım" / "Kılmadım" doğrudan bildirimden) bu yolla yoktur. İstenirse ayrı bir Windows toast paketi (örn. `windows-toasts`) denenir; v1 için şart değil.
 - Windows 11'de toast'ın gerçekten görünmesi, Odaklanma Yardımı / Rahatsız Etmeyin açık ve kapalıyken davranışı, geliştirme ile paketlenmiş exe arasındaki fark: **doğrulanmadı**.
 
+## Ayarlar ekranının durumu (Faz 6)
+
+Ayarlar sayfasındaki "Bildirimler", hatırlatma süresi, "Windows açılışında başlat" ve "Pencereyi kapatınca tepsiye küçült" anahtarları değeri `settings` tablosuna yazar ([[ekranlar]]). Etkisi: bildirim anahtarı ve hatırlatma süresi saat servisinin kararını belirler (testli); **autostart ve tepsiye küçültme henüz bir şey yapmaz** (registry kaydı, tepsi ve `onClosing` Faz 7'de).
+
 ## Sistem tepsisi
 
 - Simge: `.ico`; araç ipucu "Namaz Takip • Sıradaki: <vakit> <HH:mm>" (dakikada bir güncellenir).

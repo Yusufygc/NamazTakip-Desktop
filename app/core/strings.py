@@ -124,6 +124,39 @@ class QazaStrings:
     WIZARD_SAVE = "Kaza Planını Kaydet"
 
 
+class SettingsStrings:
+    """Ayarlar ekranı. `%1` yer tutucusunu QML `.arg()` doldurur."""
+
+    SECTION_NOTIFICATIONS = "Bildirimler"
+    NOTIFICATIONS = "Bildirimler"
+    NOTIFICATIONS_SUBTITLE = 'Ezan vakti ve "kıldın mı" hatırlatmaları'
+    REMINDER_DELAY = "Hatırlatma süresi"
+    REMINDER_DELAY_SUBTITLE = "Ezandan kaç dakika sonra"
+    MINUTES = "%1 dk"
+
+    SECTION_LOCATION = "Konum ve Vakitler"
+    LOCATION_IN_USE = "Vakit hesabında kullanılan konum"
+    NO_CITY = "Şehir seçilmedi"
+    CALC_METHOD = "Hesaplama yöntemi"
+
+    SECTION_DESKTOP = "Masaüstü"
+    AUTOSTART = "Windows açılışında başlat"
+    AUTOSTART_SUBTITLE = "Bilgisayar açılınca uygulama tepside çalışmaya başlar"
+    CLOSE_TO_TRAY = "Pencereyi kapatınca tepsiye küçült"
+    CLOSE_TO_TRAY_SUBTITLE = "Kapatınca uygulama kapanmaz; vakit bildirimleri gelmeye devam eder"
+
+    SECTION_THEME = "Tema"
+    THEME_SEMANTICS = "Tema: %1"
+    # Tema anahtarı -> (ad, alt başlık). Mobil `SettingsStrings.themeName/themeSubtitle` ile aynı.
+    THEMES = {
+        "default": ("Varsayılan", "Selçuklu Zümrüdü"),
+        "dark": ("Koyu", "Gece Kubbesi"),
+        "ocean": ("Okyanus", "İznik Çinisi"),
+        "rose": ("Gül Kurusu", "Bordo & Gül"),
+        "gold": ("Altın", "Tezhip Altını"),
+    }
+
+
 class NavStrings:
     HOME = "Vakitler"
     QAZA = "Kaza"
@@ -181,7 +214,7 @@ class CommonStrings:
     APP_NAME = APP_NAME
     CANCEL = "İptal"
     DISMISS = "Vazgeç"
-    COMING_SOON = "Bu ekran sonraki aşamada eklenecek."
+    TAGLINE = "Günlük namazlarınızı kolayca takip edin"
 
     @staticmethod
     def version_label(version: str = __version__) -> str:
@@ -250,6 +283,26 @@ def ui_strings() -> dict:
             "wizardDailyTarget": QazaStrings.WIZARD_DAILY_TARGET,
             "wizardSave": QazaStrings.WIZARD_SAVE,
         },
+        "settings": {
+            "sectionNotifications": SettingsStrings.SECTION_NOTIFICATIONS,
+            "notifications": SettingsStrings.NOTIFICATIONS,
+            "notificationsSubtitle": SettingsStrings.NOTIFICATIONS_SUBTITLE,
+            "reminderDelay": SettingsStrings.REMINDER_DELAY,
+            "reminderDelaySubtitle": SettingsStrings.REMINDER_DELAY_SUBTITLE,
+            "minutes": SettingsStrings.MINUTES,
+            "sectionLocation": SettingsStrings.SECTION_LOCATION,
+            "locationInUse": SettingsStrings.LOCATION_IN_USE,
+            "noCity": SettingsStrings.NO_CITY,
+            "calcMethod": SettingsStrings.CALC_METHOD,
+            "sectionDesktop": SettingsStrings.SECTION_DESKTOP,
+            "autostart": SettingsStrings.AUTOSTART,
+            "autostartSubtitle": SettingsStrings.AUTOSTART_SUBTITLE,
+            "closeToTray": SettingsStrings.CLOSE_TO_TRAY,
+            "closeToTraySubtitle": SettingsStrings.CLOSE_TO_TRAY_SUBTITLE,
+            "sectionTheme": SettingsStrings.SECTION_THEME,
+            "themeSemantics": SettingsStrings.THEME_SEMANTICS,
+            "themes": {key: {"name": name, "subtitle": subtitle} for key, (name, subtitle) in SettingsStrings.THEMES.items()},
+        },
         "location": {
             "needed": LocationStrings.NEEDED,
             "chooseCity": LocationStrings.CHOOSE_CITY,
@@ -261,7 +314,7 @@ def ui_strings() -> dict:
             "appName": CommonStrings.APP_NAME,
             "cancel": CommonStrings.CANCEL,
             "dismiss": CommonStrings.DISMISS,
-            "comingSoon": CommonStrings.COMING_SOON,
+            "tagline": CommonStrings.TAGLINE,
             "versionLabel": CommonStrings.version_label(),
         },
     }

@@ -2,7 +2,10 @@
 
 Kronolojik kayıt, en yeni üstte. Biçim: `## [YYYY-AA-GG] [İŞLEM_TİPİ] | Kısa açıklama`.
 
-## [2026-10-31] INGEST | Faz 5: Kaza ekranı (QML)
+## [2026-10-30] INGEST | Faz 6: Ayarlar ekranı (QML)
+Ayarlar sayfası (bildirimler + hatırlatma süresi, şehir + 6 hesaplama yöntemi, masaüstü anahtarları, 5 tema kartı) ve `SettingsSection`, `SwitchRow`, `ChoiceChips`, `RadioRow`, `ThemeCard`; `strings.settings`. Seçimler açılır liste yerine düğme grubu/radyo listesi (karar 21). Autostart ve tepsiye küçült anahtarları yalnızca ayarı saklar; etkisi Faz 7'de. Faz 1–5 daha önce beş commit olarak kaydedildi. 278 test, `ruff` temiz. Ayrıntı: [[ekranlar]], [[kararlar]], [[test-stratejisi]], [[yol-haritasi]], [[bildirim-ve-tepsi]].
+
+## [2026-10-30] INGEST | Faz 5: Kaza ekranı (QML)
 Kaza sayfası (özet kartı, geçmiş borç, açılır gün kartları, Kaza Et onayı, borç planlayıcı) ve ortak `NumberField`; `strings.qaza`. Ekran görüntüleri iki hata yakaladı: (1) `Theme.onPrimary` QML'de geçersiz renk döndürüp düğme yazısını ve simgeyi açık temalarda siyah çiziyordu (Faz 4'ten beri; `textOnPrimary`/`textOnHero` olarak yeniden adlandırıldı, `test_ui_theme` ile korunuyor); (2) küçük pencerede planlayıcının Kaydet düğmesi kaydırma alanında kayboluyordu (alta sabitlendi). Kaza rozeti dolgusu kontrast için %10'dan %6'ya indi. 259 test, `ruff` temiz. Ayrıntı: [[ekranlar]], [[test-stratejisi]], [[kararlar]], [[yol-haritasi]].
 
 ## [2026-10-30] INGEST | Faz 4: Vakitler sayfası (QML)

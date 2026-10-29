@@ -48,7 +48,7 @@ ApplicationWindow {
 
             HomePage { id: homePage }
             QazaPage { objectName: "qazaPage" }
-            PlaceholderPage { title: strings.nav.settings }
+            SettingsPage { objectName: "settingsPage" }
         }
     }
 

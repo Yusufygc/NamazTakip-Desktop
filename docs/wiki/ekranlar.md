@@ -48,7 +48,7 @@ Yazıldı ve testlerle ekransız doğrulandı; ekran görüntüleriyle (gerçek 
 | `components/CityPickerDialog.qml` | Arama kutusu + 81 il listesi; Yukarı/Aşağı + Enter ile seçim |
 | `components/DayNavigator.qml` | Önceki/sonraki gün, "Bugüne dön" |
 | `components/AppButton.qml`, `IconButton.qml`, `Card.qml`, `AppIcon.qml` | Ortak bileşenler (odak halkası, erişilebilirlik adı) |
-| `pages/HomePage.qml`, `pages/PlaceholderPage.qml` | Vakitler sayfası; Kaza ve Ayarlar için geçici "sonraki aşamada eklenecek" sayfası |
+| `pages/HomePage.qml` | Vakitler sayfası (Kaza ve Ayarlar sayfaları aşağıda; geçici sayfa kaldırıldı) |
 | `theme/Theme.qml`, `theme/Icons.qml` (+ `qmldir`) | Tema singleton'ı ve merkezi ikon yolları |
 
 Kurallar: renk yalnızca `Theme`'den, metin yalnızca `strings`'ten (Python `ui_strings()` → QML `strings` bağlam özelliği; yer tutucu `%1` için `"metin %1".arg(değer)`), ikon yalnızca `Icons`'tan (`AppIcon name:`). Sabit kullanıcı metni `tests/test_architecture.py::test_qml_sabit_metin_yok` ile yasaktır (`theme/` hariç). Her vakit satırının erişilebilirlik adı "<Vakit> vakti saat <HH:mm>, <durum>"; sayaç kartının adı "<Vakit> vaktine <süre> kaldı".
@@ -64,7 +64,7 @@ Kurallar: renk yalnızca `Theme`'den, metin yalnızca `strings`'ten (Python `ui_
 - **Planlayıcı** (ortalanmış diyalog): Yıl / Ay / Gün alanları, "Süreden Hesapla ve Vakitlere Ekle", vakit bazlı elle sayılar, "Günlük Kaza Kılma Hedefi" (1–50), "Kaza Planını Kaydet". Formül: [[takip-gunu-ve-kaza]].
 - Liste uzun olabilir: `ListView` ile gecikmeli çizim; sayfalama yok.
 
-### Kaza sayfası: uygulama durumu (Faz 5, 2026-10-31)
+### Kaza sayfası: uygulama durumu (Faz 5, 2026-10-30)
 
 Yazıldı; ekransız testlerle (`tests/test_ui_kaza.py`, 15 test) ve gerçek pencerede ekran görüntüleriyle (boş durum, dolu durum, onay, planlayıcı, koyu ve altın tema, 900×600 asgari boyut) doğrulandı.
 
@@ -91,6 +91,23 @@ Kart gruplarıyla tek sütun, en çok 720 px, ortalı.
 | Masaüstü | "Windows açılışında başlat" anahtarı; "Pencereyi kapatınca tepsiye küçült" anahtarı |
 | Tema | 5 tema kartı: simge, ad, alt başlık, 4 renk örneği, seçili kenarlığı |
 | Alt bilgi | Sürüm ve alt metin |
+
+### Ayarlar sayfası: uygulama durumu (Faz 6, 2026-10-30)
+
+Yazıldı; `tests/test_ui_settings.py` (18 test) ve gerçek pencerede ekran görüntüleriyle (5 tema, bildirim kapalı durumu, 900×600, tema bölümü) doğrulandı.
+
+| Dosya (`app/ui/qml/`) | İş |
+|---|---|
+| `pages/SettingsPage.qml` | Tek sütun, en çok 720 px, ortalı: Bildirimler, Konum ve Vakitler, Masaüstü, Tema, alt bilgi |
+| `components/SettingsSection.qml` | Başlıklı kart grubu (alt öğeler karta eklenir) |
+| `components/SwitchRow.qml` | Başlık + açıklama + anahtar (`Switch` tabanlı: klavye, odak halkası, erişilebilirlik adı) |
+| `components/ChoiceChips.qml` | Tek seçimli düğme grubu (hatırlatma süresi: 5, 10, 15, 20, 30, 45, 60 dk); bildirim kapalıyken pasif |
+| `components/RadioRow.qml` | Liste biçiminde tek seçim (6 hesaplama yöntemi) |
+| `components/ThemeCard.qml` | Ad, alt başlık, 4 renk örneği (`Theme.palettes`'ten, kartın kendi teması), seçili kenarlık + onay simgesi |
+
+Spesifikasyondan sapmalar: hatırlatma süresi ve hesaplama yöntemi "açılır liste" yerine düğme grubu / radyo listesi olarak yapıldı (masaüstünde tek tıkla seçim, açılır menü gerektirmez; [[kararlar]] 21). Tema kartında tema başına simge yok, renk örnekleri kimliği taşır. Alt bilgi: "Sürüm 0.1.0 • Günlük namazlarınızı kolayca takip edin" (mobildeki geliştirici adı alınmadı).
+
+**Önemli — ayar var, etki henüz yok:** "Windows açılışında başlat" ve "Pencereyi kapatınca tepsiye küçült" anahtarları yalnızca değeri saklar. Registry kaydı, tepsi ve pencere davranışı Faz 7'dedir ([[bildirim-ve-tepsi]]); ilk açılışta autostart sorusu da orada gelecek ([[kararlar]] 12). "Bildirimler" anahtarı ve hatırlatma süresi saat servisinin kararını gerçekten etkiler (testle doğrulandı), ancak bildirimin ekranda gösterimi de Faz 7'dedir.
 
 **Şehir seçici:** arama kutusu (otomatik odak), 81 ilin listesi, Türkçe duyarsız arama (`fold_turkish`: "istanbul", "Şanlıurfa", "igdir" eşleşir). Seçince vakitler yeniden hesaplanır. İlk açılışta zorunlu gösterilir; varsayılan öneri İstanbul.
 

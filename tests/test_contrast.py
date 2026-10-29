@@ -76,6 +76,8 @@ def pairs(p: dict) -> dict[str, tuple]:
         "vurgu yazısı / sıradaki satır": (p["secondaryText"], next_row),
         "kaza rozeti: birincil / kart %6": (p["primary"], blend(p["primary"], 0.06, card)),  # DayCard
         "açık düğme yazısı / beyaz": (hero_start, WHITE),  # AppButton variant "light" (özet kartı üstü)
+        "seçenek yazısı / %6 dolgu": (p["text"], blend(p["primary"], 0.06, card)),  # ChoiceChips (seçilmemiş)
+        "seçili satır yazısı / %8 dolgu": (p["text"], blend(p["primary"], 0.16 if dark else 0.08, card)),  # RadioRow
         "düğme yazısı / birincil": (on_primary, p["primary"]),
         "düğme yazısı / tehlike": (on_primary, p["danger"]),
         "sayaç beyaz / degrade başı": (WHITE, hero_start),
