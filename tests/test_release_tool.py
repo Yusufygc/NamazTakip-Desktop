@@ -205,7 +205,7 @@ class TestIsAkislari:
             assert versions == {"3.10.11"}  # exe özeti Python sürümüne bağlı
 
     def test_ci_lint_test_ve_guvenlik_taramasi(self):
-        for expected in ("ruff check", "pytest -q", "pip_audit -r requirements.txt", "QT_QPA_PLATFORM: offscreen", "PYTHONWARNDEFAULTENCODING"):
+        for expected in ("ruff check", "python -m pytest", "pip_audit -r requirements.txt", "QT_QPA_PLATFORM: offscreen", "PYTHONWARNDEFAULTENCODING"):
             assert expected in self.ci_yml, expected
         assert re.search(r"pip-audit==\d+\.\d+\.\d+", self.ci_yml)  # sürüm sabit
 

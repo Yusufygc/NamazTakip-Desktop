@@ -154,7 +154,7 @@ class TestLaunchCheck:
         def popen(command, cwd=None, env=None):
             seen["env"] = env
             seen["dir"] = Path(env["NAMAZ_TAKIP_DATA_DIR"])
-            (seen["dir"] / "namaz_takip.db").write_text("x")
+            (seen["dir"] / "namaz_takip.db").write_text("x", encoding="utf-8")
             return FakeProcess(None)
 
         monkeypatch.setattr(subprocess, "Popen", popen)

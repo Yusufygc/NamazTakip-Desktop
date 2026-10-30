@@ -92,13 +92,13 @@ class TestOnayKapisi:
 
     def test_ayni_ozet_gecer(self, tmp_path, capsys):
         exe = self.fake_exe(tmp_path)
-        (tmp_path / "packaging" / "launcher.sha256").write_text(f"{build_exe.exe_sha256(exe)} *NamazTakip.exe\n")
+        (tmp_path / "packaging" / "launcher.sha256").write_text(f"{build_exe.exe_sha256(exe)} *NamazTakip.exe\n", encoding="utf-8")
         build_exe.check_launcher_hash(tmp_path, exe)
         assert "onaylananla aynı" in capsys.readouterr().out
 
     def test_farkli_ozet_durdurur(self, tmp_path):
         exe = self.fake_exe(tmp_path)
-        (tmp_path / "packaging" / "launcher.sha256").write_text(f"{'0' * 64} *NamazTakip.exe\n")
+        (tmp_path / "packaging" / "launcher.sha256").write_text(f"{'0' * 64} *NamazTakip.exe\n", encoding="utf-8")
         with pytest.raises(SystemExit):
             build_exe.check_launcher_hash(tmp_path, exe)
 
