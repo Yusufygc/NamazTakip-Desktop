@@ -12,6 +12,7 @@ import uuid
 from pathlib import Path
 
 import pytest
+from PySide6.QtCore import QCoreApplication, QEvent
 
 from app.services.single_instance import SingleInstance
 
@@ -93,6 +94,10 @@ def instances(qapp, name, tmp_path):
     yield make
     for instance in created:
         instance.release()
+    # Sunucu ve bağlantı yuvalarının ertelenmiş silmesini sonraki testten ÖNCE tamamla: CI'da (windows-latest) bir önceki
+    # testin yarım kalan boru dinleyicisi sonraki testin ilk `processEvents` çağrısında süreci çökertiyordu (Aborted).
+    QCoreApplication.sendPostedEvents(None, QEvent.Type.DeferredDelete)
+    qapp.processEvents()
 
 
 def test_ilk_ornek_kilidi_alir_ikinci_alamaz(qapp, instances):

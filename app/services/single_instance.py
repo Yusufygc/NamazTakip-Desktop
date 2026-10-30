@@ -59,6 +59,7 @@ class SingleInstance(QObject):
     def release(self) -> None:
         if self._server is not None:
             self._server.close()
+            self._server.deleteLater()  # bekleyen bağlantı yuvaları olay döngüsünde düzenli kapansın
             self._server = None
         if self._lock is not None:
             self._lock.unlock()
