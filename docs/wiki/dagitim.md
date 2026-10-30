@@ -46,9 +46,15 @@ Onaylı özet: `ed66570c689362cf…` (bkz. `packaging/launcher.sha256`).
 | `build_installer.py` tam akış: derle → kapı → exe denemesi → Inno → sessiz kurulum → kurulan exe denemesi → kaldırıcı | Geçti; kurulum dosyası **36,7 MB**; gerçek kayıt ve Başlat kısayolu etkilenmedi (deneme sonrası ikisi de yok/aynı) |
 | Satır sonları | Giriş betiği ve sürüm kaynağı LF (`tests/test_release_packaging.py` özetlerini sabitler) |
 
+### CI'da doğrulananlar (2026-10-30, `ci.yml`, windows-latest, Python 3.10.11)
+
+- **CI'da derlenen kararlı exe'nin özeti yerelle bayt bayt aynı** (`ed66570c689362cf…`): `exe-ozeti` işi onay kapısından geçti. Yerelde farklı klasörde derleme denenmemişti; CI farklı kök yolu (`D:\…`) ve farklı makineyle bunu da kanıtladı.
+- 602 test yeşil (UTC saat diliminde, yani Türkiye dışı makinede), `ruff` yeşil.
+- İlk koşular kırmızıydı; dersler: (1) `PYTHONWARNDEFAULTENCODING=1` altında üç test kodlamasız `write_text` çağırıyordu (yerelde bu değişken yokken görünmüyordu: yerelde de `PYTHONWARNDEFAULTENCODING=1` ile koş); (2) container kullanan testler makinenin saat dilimine bağlıydı (UTC'de vakit saatleri 3 saat kayıyordu): `tests/conftest.py` `fixed_timezone` ile `PrayerService`'i UTC+3 sabitliyor; (3) `test_single_instance` üçüncü testte `Fatal Python error: Aborted` ile süreci çökertiyordu (yalnızca CI, yerelde yeniden üretilemedi): sunucu `release()` içinde `deleteLater()` alıyor ve fixture ertelenmiş silmeyi sonraki testten önce tamamlıyor; sonrasında kararlı. Kök neden kesin belirlenmedi (**doğrulanmadı**); düzeltme belirtiyi giderdi.
+
 ### Doğrulanmadı
 
-- **İş akışları GitHub'da hiç koşmadı** (yalnızca YAML sözdizimi ayrıştırıldı ve metin testleri geçti). `windows-latest` üzerinde kurulumlar, offscreen QML testleri, `choco install innosetup`, `pip-audit` sonucu ve `gh release create` bilinmiyor. İlk push'ta `ci.yml` koşacak; `release.yml` yalnızca etiketle.
+- **`release.yml` GitHub'da hiç koşmadı** (yalnızca etiketle çalışır): `choco install innosetup`, CI'da `build_installer.py` ve `gh release create` bilinmiyor. `ci.yml` koştu (aşağıda).
 - **SAC bu makinede kapalı** (`VerifiedAndReputablePolicyState` = 0). Bu yüzden "exe engellenmedi" denemesi SAC açısından bir şey kanıtlamaz; yalnızca exe'nin açıldığını gösterir. SAC'ın gerçek etkisi SAC'lı bir makinede denenmeli.
 - Farklı kök klasörde derleme (CI'a benzetmek için) ve **CI'da derlenen exe'nin yerel özetle aynı çıkması** (Aşama 2'de kapıyla sınanır).
 - İndirilmiş (MOTW'li) kurulum dosyasının başka bir bilgisayarda açılması.

@@ -2,6 +2,9 @@
 
 Kronolojik kayıt, en yeni üstte. Biçim: `## [YYYY-AA-GG] [İŞLEM_TİPİ] | Kısa açıklama`.
 
+## [2026-10-30] INGEST | İlk push ve CI doğrulaması
+Üç aşama push edildi (`1f6f7f1`). `ci.yml` ilk koşuda kırmızıydı: kodlamasız `write_text` (3 test), makine saat dilimine bağlı testler (UTC runner) ve `test_single_instance`'ta `Aborted` süreç çökmesi. Düzeltmeler: encoding, `fixed_timezone` fixture'ı, tek örnek sunucusunun ertelenmiş silmesi. Sonuç: **CI yeşil (602 test, ruff, pip-audit), `exe-ozeti` işi geçti: CI'da derlenen kararlı exe özeti yerelle aynı (`ed66570c…`)**. `release.yml` hâlâ koşmadı. Ayrıntı: [[dagitim]], [[test-stratejisi]].
+
 ## [2026-10-30] INGEST | Prod hazırlığı Aşama 3: uygulama içi güncelleme
 Aşama 2 commit edildi (`92361cc`); kullanıcı düzeltmesi: `THIRD_PARTY_NOTICES.md`'deki adhanpy MIT metnini kendisi silmişti, bir daha eklenmeyecek (üretici `embed=False`; hafızaya yazıldı). Referans GitClean'in `update_service`, `UpdateViewModel`, `UpdateDialog.qml` ve testleri Namaz Takip'e uyarlandı: `app/services/update_service.py`, `app/bridge/update_bridge.py`, `components/UpdateDialog.qml`, Ayarlar → Güncellemeler kartı, `UpdateStrings`, SQLite tercihleri (`update_check_enabled`, `update_skipped_version`), `main.py`'de 3 sn sonra açılış denetimi, `shell_bridge`'e kurulum sonrası çıkış bağlantısı. Namaz Takip'e özgü: paketlenmemiş çalışmada kurulum yok (sürüm sayfası), pencere öncelik sırası, gizliyken tepsi bildirimi. 99 yeni test (602). Aşama 3 sonrası kararlı exe özeti yine onaylananla aynı (`ed66570c…`). **Doğrulanmadı:** gerçek Release'e karşı uçtan uca güncelleme, SAC'ın kurulum dosyasına tepkisi, Inno `CloseApplications` ile tepside çalışan uygulamanın kapanışı. Yeni sayfa [[guncelleme]]. Ayrıntı: [[dagitim]], [[kararlar]], [[yol-haritasi]], [[test-stratejisi]].
 
