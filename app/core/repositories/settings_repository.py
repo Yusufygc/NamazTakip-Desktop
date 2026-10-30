@@ -34,6 +34,8 @@ KEY_CLOSE_TO_TRAY = "close_to_tray"
 KEY_TRAY_HINT_SHOWN = "tray_hint_shown"
 KEY_PRE_REMINDER_MINUTES = "pre_reminder_minutes"
 KEY_LAST_ACTIVE_AT = "last_active_at"
+KEY_UPDATE_CHECK = "update_check_enabled"
+KEY_UPDATE_SKIPPED = "update_skipped_version"
 
 DEFAULT_THEME = "default"
 DEFAULT_REMINDER_MINUTES = 15
@@ -173,6 +175,24 @@ class SettingsRepository:
 
     def set_last_active_at(self, value: datetime) -> None:
         self._set(KEY_LAST_ACTIVE_AT, value.isoformat())
+
+    # ---- Güncelleme tercihleri ------------------------------------------------------
+
+    @property
+    def update_check_enabled(self) -> bool:
+        """Açılışta GitHub'dan yeni sürüm sorulsun mu (varsayılan: evet)."""
+        return bool(self._get_bool(KEY_UPDATE_CHECK, True))
+
+    def set_update_check_enabled(self, value: bool) -> None:
+        self._set_bool(KEY_UPDATE_CHECK, value)
+
+    @property
+    def update_skipped_version(self) -> str:
+        """"Bu sürümü atla" denen sürüm (`X.Y.Z`); yoksa boş."""
+        return self._get(KEY_UPDATE_SKIPPED) or ""
+
+    def set_update_skipped_version(self, version: str) -> None:
+        self._set(KEY_UPDATE_SKIPPED, version)
 
     # ---- Bozuk veritabanı uyarısı -------------------------------------------------
 

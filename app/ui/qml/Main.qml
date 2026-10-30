@@ -61,16 +61,43 @@ ApplicationWindow {
             missedDialog.open()
     }
 
-    onVisibleChanged: maybeShowMissed()
+    // "Yeni sürüm var" penceresi: yalnızca pencere görünürken ve başka bir soru açık değilken açılır; aksi hâlde bekler.
+    property bool updatePending: false
+
+    function maybeShowUpdate() {
+        if (updatePending && visible && !updateDialog.opened && !missedDialog.opened && !autostartPrompt.opened
+                && !settingsBridge.needsAutostartPrompt && missedBridge.count === 0) {
+            updatePending = false
+            updateDialog.open()
+        }
+    }
+
+    onVisibleChanged: { maybeShowMissed(); maybeShowUpdate() }
 
     Connections {
         target: missedBridge
-        function onChanged() { root.maybeShowMissed() }
+        function onChanged() { root.maybeShowMissed(); root.maybeShowUpdate() }
     }
 
     Connections {
         target: autostartPrompt
-        function onClosed() { root.maybeShowMissed() }
+        function onClosed() { root.maybeShowMissed(); root.maybeShowUpdate() }
+    }
+
+    Connections {
+        target: missedDialog
+        function onClosed() { root.maybeShowUpdate() }
+    }
+
+    Connections {
+        target: updateBridge
+        function onPopupRequested() {
+            root.updatePending = true
+            if (root.visible)
+                root.maybeShowUpdate()
+            else
+                tray.notify(strings.update.notificationTitle, strings.update.notificationBody.arg(updateBridge.latestVersion))
+        }
     }
 
     Connections {
@@ -94,6 +121,7 @@ ApplicationWindow {
 
     AutostartPromptDialog { id: autostartPrompt }
     MissedPrayersDialog { id: missedDialog }
+    UpdateDialog { id: updateDialog }
 
     Shortcut { sequence: "Ctrl+1"; onActivated: root.pageIndex = 0 }
     Shortcut { sequence: "Ctrl+2"; onActivated: root.pageIndex = 1 }

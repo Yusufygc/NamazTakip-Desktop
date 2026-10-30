@@ -211,6 +211,83 @@ class AutostartPromptStrings:
     NO = "Hayır"
 
 
+class UpdateStrings:
+    """Uygulama içi güncelleme: servis/köprü iletileri (Python) ve pencere/kart metinleri (QML `%1` ile)."""
+
+    # Servis ve köprü iletileri (kullanıcıya gösterilebilir)
+    CHECKING = "Güncellemeler denetleniyor…"
+    CHECK_FAILED = "Güncelleme denetimi yapılamadı."
+    DOWNLOAD_FAILED = "Güncelleme indirilemedi."
+    INSTALL_FAILED = "Kurulum başlatılamadı."
+    RELEASE_PAGE_HINT = "Sürüm sayfası tarayıcıda açılır."
+    UNTRUSTED_RELEASE_ADDRESS = "Sürüm kaydındaki adres güvenilir değil, yok sayıldı."
+    REDIRECTED = "Beklenmeyen bir adrese yönlendirildi."
+    RATE_LIMITED = "GitHub istek sınırına ulaşıldı; biraz sonra yeniden deneyin."
+    UNREACHABLE = "GitHub'a ulaşılamadı. İnternet bağlantınızı denetleyin."
+    RESPONSE_TOO_LARGE = "Yanıt beklenenden büyük, yok sayıldı."
+    RESPONSE_UNREADABLE = "GitHub yanıtı okunamadı."
+    SERVER_UNREACHABLE = "Güncelleme sunucusuna ulaşılamadı."
+    NO_INSTALLER = "Bu sürümde kurulum dosyası yok; sürüm sayfasından indirin."
+    NO_CHECKSUM = "Kurulum dosyasının SHA-256 özeti bulunamadı; güvenlik için güncelleme iptal edildi."
+    DOWNLOAD_TOO_LARGE = "İndirilen dosya beklenenden büyük; iptal edildi."
+    DOWNLOAD_INCOMPLETE = "İndirilen dosya eksik; boyut uyuşmuyor."
+    DOWNLOAD_UNVERIFIED = "İndirilen dosya doğrulanamadı; özet uyuşmuyor."
+    WINDOWS_ONLY = "Otomatik kurulum yalnızca Windows'ta desteklenir."
+    INSTALLER_MISSING = "Kurulum dosyası bulunamadı."
+    BLOCKED = (
+        "Windows (Akıllı Uygulama Denetimi) kurulum dosyasını şimdilik engelledi. Dosya indirildi ve doğrulandı; "
+        "klasörde gösterildi: çift tıklayarak kurabilirsiniz. Olmazsa birkaç dakika sonra yeniden deneyin."
+    )
+    WAITING_FOR_WINDOWS = (
+        "Windows (Akıllı Uygulama Denetimi) kurulum dosyasını denetliyor; engel kalkınca kurulum kendiliğinden başlayacak. Bekleniyor…"
+    )
+
+    @staticmethod
+    def up_to_date(version: str) -> str:
+        return f"Güncelsiniz: v{version} en son sürüm."
+
+    @staticmethod
+    def new_version(version: str) -> str:
+        return f"Yeni sürüm var: v{version}"
+
+    @staticmethod
+    def http_error(code: int) -> str:
+        return f"GitHub yanıt hatası ({code})."
+
+    @staticmethod
+    def download_error(reason: str) -> str:
+        return f"Güncelleme indirilemedi: {reason}"
+
+    @staticmethod
+    def launch_error(reason: str) -> str:
+        return f"Kurulum başlatılamadı: {reason}"
+
+    # Pencere ve Ayarlar kartı (QML `.arg()` ile doldurulur)
+    DIALOG_TITLE = "Yeni sürüm var"
+    HEADLINE = "Namaz Takip v%1 yayınlandı"
+    VERSIONS = "Kurulu sürüm: v%1"
+    PUBLISHED = "  •  Yayın tarihi: %1"
+    FILE = "İndirilecek dosya: %1"
+    EXPLANATION = (
+        "Güncelle: kurulum dosyası indirilir ve SHA-256 özeti doğrulanır, uygulama kapanır, kurulum üstüne yazar ve "
+        "uygulama yeniden açılır. Verileriniz ve yedekleriniz korunur."
+    )
+    SKIP = "Bu Sürümü Atla"
+    LATER = "Sonra"
+    STOP_WAITING = "Beklemeyi Bırak"
+    RELEASE_PAGE = "Sürüm Sayfası"
+    UPDATE = "Güncelle"
+    DOWNLOADING = "İndiriliyor… %1%"
+    WAITING_BUTTON = "Windows bekleniyor…"
+    NOTIFICATION_TITLE = "Yeni sürüm var"
+    NOTIFICATION_BODY = "Namaz Takip v%1 yayınlandı. Güncellemek için pencereyi açın."
+    SECTION = "Güncellemeler"
+    CHECK_ON_START = "Açılışta güncellemeyi denetle"
+    CHECK_ON_START_SUBTITLE = "GitHub'a yalnızca son sürüm sorulur; kimlik ya da kullanım bilgisi gönderilmez"
+    CURRENT_VERSION = "Kurulu sürüm: v%1"
+    CHECK_NOW = "Şimdi Denetle"
+
+
 class NavStrings:
     HOME = "Vakitler"
     QAZA = "Kaza"
@@ -377,6 +454,28 @@ def ui_strings() -> dict:
             "body": AutostartPromptStrings.BODY,
             "yes": AutostartPromptStrings.YES,
             "no": AutostartPromptStrings.NO,
+        },
+        "update": {
+            "dialogTitle": UpdateStrings.DIALOG_TITLE,
+            "headline": UpdateStrings.HEADLINE,
+            "versions": UpdateStrings.VERSIONS,
+            "published": UpdateStrings.PUBLISHED,
+            "file": UpdateStrings.FILE,
+            "explanation": UpdateStrings.EXPLANATION,
+            "skip": UpdateStrings.SKIP,
+            "later": UpdateStrings.LATER,
+            "stopWaiting": UpdateStrings.STOP_WAITING,
+            "releasePage": UpdateStrings.RELEASE_PAGE,
+            "update": UpdateStrings.UPDATE,
+            "downloading": UpdateStrings.DOWNLOADING,
+            "waitingButton": UpdateStrings.WAITING_BUTTON,
+            "notificationTitle": UpdateStrings.NOTIFICATION_TITLE,
+            "notificationBody": UpdateStrings.NOTIFICATION_BODY,
+            "section": UpdateStrings.SECTION,
+            "checkOnStart": UpdateStrings.CHECK_ON_START,
+            "checkOnStartSubtitle": UpdateStrings.CHECK_ON_START_SUBTITLE,
+            "currentVersion": UpdateStrings.CURRENT_VERSION,
+            "checkNow": UpdateStrings.CHECK_NOW,
         },
         "missed": {
             "notificationTitle": MissedStrings.NOTIFICATION_TITLE,

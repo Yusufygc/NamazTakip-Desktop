@@ -54,6 +54,8 @@ Değerler metin olarak saklanır (bool `"1"/"0"`, JSON metin). Bozuk veya eksik 
 | `autostart` | bool | yok (ilk açılışta sorulur, [[kararlar]] 12) | Windows açılışında başlat; anahtar yoksa soru gösterilir |
 | `close_to_tray` | bool | `1` | Pencereyi kapatınca tepsiye küçült ([[kararlar]] 13) |
 | `tray_hint_shown` | bool | `0` | İlk kapatmadaki "tepside çalışıyor" bilgisi gösterildi mi |
+| `update_check_enabled` | bool | `1` | Açılışta GitHub'dan yeni sürüm sorulsun mu ([[guncelleme]]) |
+| `update_skipped_version` | metin (`X.Y.Z`) | yok | "Bu sürümü atla" denen sürüm: yalnızca açılış denetiminde sessiz kalır |
 | `last_active_at` | ISO tarih-saat (saat dilimli) | yok | Uygulamanın en son çalıştığı an (dakikada bir, kapanışta); açılışta kapalıyken kaçan vakitleri bulmak için. Saat dilimsiz veya bozuk değer yok sayılır |
 | `window_bounds` | JSON | yok | İsteğe bağlı: son pencere boyutu/konumu |
 

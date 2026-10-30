@@ -8,7 +8,7 @@ from pathlib import Path
 # QML kontrollerinin özelleştirilebilmesi için Basic stil zorunlu.
 os.environ.setdefault("QT_QUICK_CONTROLS_STYLE", "Basic")
 
-from PySide6.QtCore import QUrl  # noqa: E402
+from PySide6.QtCore import QTimer, QUrl  # noqa: E402
 from PySide6.QtGui import QGuiApplication, QIcon  # noqa: E402
 from PySide6.QtQml import QQmlApplicationEngine  # noqa: E402
 
@@ -25,6 +25,7 @@ else:
 
 QML_DIR = os.path.join(BASE_DIR, "app", "ui", "qml")
 ASSETS_DIR = Path(BASE_DIR) / "app" / "ui" / "assets"
+UPDATE_CHECK_DELAY_MS = 3000
 
 
 def parse_args(argv: list[str]) -> argparse.Namespace:
@@ -89,6 +90,8 @@ def main() -> int:
 
     app.aboutToQuit.connect(cleanup)
     container.start()
+    # Güncelleme denetimi pencere çizildikten sonra (testler ve `build_engine` ağa çıkmasın diye burada).
+    QTimer.singleShot(UPDATE_CHECK_DELAY_MS, container.update_bridge.startupCheck)
 
     exit_code = app.exec()
     logger.info("Uygulama %s koduyla kapanıyor.", exit_code)

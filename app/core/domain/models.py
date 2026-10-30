@@ -51,6 +51,7 @@ class AppSettings:
     autostart: "bool | None"  # None: henüz sorulmadı
     close_to_tray: bool
     tray_hint_shown: bool
+    update_check_enabled: bool = True
 
 
 @dataclass(frozen=True)

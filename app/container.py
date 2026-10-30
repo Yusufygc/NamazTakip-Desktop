@@ -13,6 +13,7 @@ from app.bridge.missed_bridge import MissedBridge
 from app.bridge.qaza_bridge import QazaBridge
 from app.bridge.settings_bridge import SettingsBridge
 from app.bridge.shell_bridge import ShellBridge
+from app.bridge.update_bridge import UpdateBridge
 from app.core.backup import run_daily_backup
 from app.core.clock import Clock, system_now
 from app.core.database import AppDatabase
@@ -57,6 +58,7 @@ class AppContainer:
         self.qaza_bridge = QazaBridge(self.qaza_service)
         self.settings_bridge = SettingsBridge(self.settings_service)
         self.missed_bridge = MissedBridge(self.missed_service, now)
+        self.update_bridge = UpdateBridge(self.settings_service)
         assets = assets_dir if assets_dir is not None else Path(__file__).resolve().parent / "ui" / "assets"
         tray_icon_url = QUrl.fromLocalFile(str(assets / "tray.png")).toString()
         self.shell_bridge = ShellBridge(start_hidden, tray_icon_url)
@@ -69,6 +71,8 @@ class AppContainer:
         # Açılış sorusuna verilen cevap Vakitler ve Kaza ekranlarını yeniler.
         self.missed_bridge.recordsChanged.connect(self.home_bridge.refresh)
         self.missed_bridge.recordsChanged.connect(self.qaza_bridge.refresh)
+        # Kurulum başlatılınca uygulama kapanır (kurulum üstüne yazar ve uygulamayı yeniden açar).
+        self.update_bridge.quitRequested.connect(self.shell_bridge.quitRequested)
         # İşaret yazılınca kaza listesi, kaza edilince vakitler ekranı yenilenir.
         self.home_bridge.recordsChanged.connect(self.qaza_bridge.refresh)
         self.qaza_bridge.changed.connect(self.home_bridge.refresh)
@@ -83,6 +87,7 @@ class AppContainer:
         context.setContextProperty("settingsBridge", self.settings_bridge)
         context.setContextProperty("shellBridge", self.shell_bridge)
         context.setContextProperty("missedBridge", self.missed_bridge)
+        context.setContextProperty("updateBridge", self.update_bridge)
         context.setContextProperty("strings", ui_strings())
 
     def _touch_last_active(self, tick) -> None:

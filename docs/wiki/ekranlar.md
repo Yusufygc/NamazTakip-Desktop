@@ -50,6 +50,7 @@ Yazıldı ve testlerle ekransız doğrulandı; ekran görüntüleriyle (gerçek 
 | `components/AppButton.qml`, `IconButton.qml`, `Card.qml`, `AppIcon.qml` | Ortak bileşenler (odak halkası, erişilebilirlik adı) |
 | `components/AppTrayIcon.qml` | Sistem tepsisi: ipucu, menü (Göster/Gizle, sıradaki vakit, Bildirimler Açık/Kapalı, Çıkış), bildirim (`showMessage`), ilk kapatma bilgisi, bildirime tıklama |
 | `components/MissedPrayersDialog.qml` | Açılışta "Bu vakitleri kıldınız mı?": uygulama kapalıyken giren işaretsiz vakitler, satır başına Kıldım / Kılmadım, altta Sonra ([[bildirim-ve-tepsi]]) |
+| `components/UpdateDialog.qml` | "Yeni sürüm var": sürüm notları (düz metin), kurulum dosyası bilgisi, Güncelle / Sonra / Bu Sürümü Atla, indirme ilerlemesi, Windows bekleme durumu ([[guncelleme]]) |
 | `components/AutostartPromptDialog.qml` | İlk açılışta "Windows açılınca başlasın mı?" (Evet, başlasın / Hayır) |
 | `pages/HomePage.qml` | Vakitler sayfası (Kaza ve Ayarlar sayfaları aşağıda; geçici sayfa kaldırıldı) |
 | `theme/Theme.qml`, `theme/Icons.qml` (+ `qmldir`) | Tema singleton'ı ve merkezi ikon yolları |
@@ -92,6 +93,7 @@ Kart gruplarıyla tek sütun, en çok 720 px, ortalı.
 | Bildirimler | "Bildirimler" anahtarı (alt başlık: Vakitten önce haber, ezan vakti ve "kıldın mı" hatırlatmaları); "Vakitten önce haber ver" listesi: Kapalı, 10, 15, 20, 30, **40**, 45, 60 dk; "Hatırlatma süresi" listesi: 5, 10, 15, 20, 30, 45, 60 dk (ikisi de bildirim kapalıyken pasif) |
 | Konum ve Vakitler | Seçili şehir ("Vakit hesabında kullanılan konum"), **Şehir seç**; "Hesaplama yöntemi" listesi (6 yöntem, adlar: [[vakit-hesabi]]) |
 | Masaüstü | "Windows açılışında başlat" anahtarı; "Pencereyi kapatınca tepsiye küçült" anahtarı |
+| Güncellemeler | "Açılışta güncellemeyi denetle" anahtarı; "Kurulu sürüm: vX" ve durum satırı; **Şimdi Denetle** ([[guncelleme]]) |
 | Tema | 5 tema kartı: simge, ad, alt başlık, 4 renk örneği, seçili kenarlığı |
 | Alt bilgi | Sürüm ve alt metin |
 

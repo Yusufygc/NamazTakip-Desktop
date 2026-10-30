@@ -21,6 +21,7 @@ Python + PySide6 (QML) + SQLite ile yazıldı. Verileriniz yalnızca kendi bilgi
 - **81 il, 6 hesaplama yöntemi.** Varsayılan Diyanet; Müslüman Dünya Birliği, Mısır, Karaçi, Ümmü'l-Kura ve ISNA da seçilebilir.
 - **5 tema.** Selçuklu Zümrüdü, Koyu, Okyanus, Gül Kurusu ve Altın.
 - **Günlük yedek.** Veritabanı her gün otomatik yedeklenir (son 7 yedek tutulur).
+- **Kendini güncelleyebilir.** Açılışta yeni sürüm olup olmadığına bakar; varsa sorar. Güncelleme indirilir, bütünlüğü (SHA-256) doğrulanır ve verileriniz korunarak kurulur.
 
 ## Ekran görüntüleri
 
@@ -131,6 +132,10 @@ python build_installer.py     # kurulum dosyası üret
 | `packaging/` | Kurulum betiği (Inno), sabit giriş betiği, onaylı exe özeti |
 | `tools/` | Simge üretimi, taşınabilir exe betiği |
 | `docs/wiki/` | Proje bilgi tabanı |
+
+## Gizlilik
+
+Uygulama hesap istemez ve verilerinizi hiçbir yere göndermez. **Tek ağ isteği** güncelleme denetimidir: açılışta GitHub'a "en son sürüm hangisi?" diye sorulur (`api.github.com/repos/Yusufygc/NamazTakip-Desktop/releases/latest`). Bu istekte işaretleriniz, şehriniz ya da herhangi bir kimlik/kullanım bilgisi gönderilmez; GitHub her web isteğinde olduğu gibi yalnızca isteğin geldiği IP adresini görür. Kapatmak için Ayarlar → Güncellemeler → "Açılışta güncellemeyi denetle" anahtarını kapatın ya da `NAMAZ_TAKIP_NO_UPDATE_CHECK=1` ortam değişkenini ayarlayın. Kurulum dosyası yalnızca siz "Güncelle" derseniz indirilir.
 
 ## Sınırlar
 

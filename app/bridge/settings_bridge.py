@@ -81,6 +81,10 @@ class SettingsBridge(QObject):
         return self._settings.settings.close_to_tray
 
     @Property(bool, notify=settingsChanged)
+    def updateCheckEnabled(self) -> bool:
+        return self._settings.settings.update_check_enabled
+
+    @Property(bool, notify=settingsChanged)
     def trayHintShown(self) -> bool:
         return self._settings.settings.tray_hint_shown
 
@@ -133,6 +137,10 @@ class SettingsBridge(QObject):
     @Slot(bool)
     def setCloseToTray(self, enabled: bool) -> None:
         self._apply(lambda: self._settings.set_close_to_tray(enabled))
+
+    @Slot(bool)
+    def setUpdateCheckEnabled(self, enabled: bool) -> None:
+        self._apply(lambda: self._settings.set_update_check_enabled(enabled))
 
     @Slot()
     def markTrayHintShown(self) -> None:

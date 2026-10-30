@@ -33,6 +33,7 @@ class SettingsService:
             autostart=self._repo.autostart,
             close_to_tray=self._repo.close_to_tray,
             tray_hint_shown=self._repo.tray_hint_shown,
+            update_check_enabled=self._repo.update_check_enabled,
         )
 
     # ---- Konum ve yöntem ----------------------------------------------------------
@@ -125,6 +126,18 @@ class SettingsService:
 
     def mark_tray_hint_shown(self) -> None:
         self._repo.set_tray_hint_shown(True)
+
+    # ---- Güncelleme tercihleri ------------------------------------------------------
+
+    def set_update_check_enabled(self, enabled: bool) -> None:
+        self._repo.set_update_check_enabled(enabled)
+
+    @property
+    def update_skipped_version(self) -> str:
+        return self._repo.update_skipped_version
+
+    def set_update_skipped_version(self, version: str) -> None:
+        self._repo.set_update_skipped_version(version)
 
     # ---- Takip başlangıcı ve kaza planı ---------------------------------------
 

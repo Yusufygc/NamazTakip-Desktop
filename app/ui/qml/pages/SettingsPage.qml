@@ -198,6 +198,57 @@ Item {
                     }
                 }
 
+                // ---- Güncellemeler ----
+                SettingsSection {
+                    Layout.fillWidth: true
+                    title: strings.update.section
+
+                    SwitchRow {
+                        objectName: "updateCheckSwitch"
+                        Layout.fillWidth: true
+                        title: strings.update.checkOnStart
+                        subtitle: strings.update.checkOnStartSubtitle
+                        checked: settingsBridge.updateCheckEnabled
+                        onToggled: settingsBridge.setUpdateCheckEnabled(checked)
+                    }
+
+                    RowLayout {
+                        Layout.fillWidth: true
+                        Layout.margins: 14
+                        spacing: 12
+
+                        ColumnLayout {
+                            Layout.fillWidth: true
+                            spacing: 2
+                            Text {
+                                objectName: "updateCurrentVersion"
+                                text: strings.update.currentVersion.arg(updateBridge.currentVersion)
+                                font.family: Theme.fontFamily
+                                font.pixelSize: 16
+                                font.weight: Font.DemiBold
+                                color: Theme.text
+                            }
+                            Text {
+                                objectName: "updateStatusText"
+                                Layout.fillWidth: true
+                                visible: updateBridge.statusText !== ""
+                                wrapMode: Text.WordWrap
+                                text: updateBridge.statusText
+                                font.family: Theme.fontFamily
+                                font.pixelSize: 12
+                                color: Theme.textLight
+                            }
+                        }
+                        AppButton {
+                            objectName: "checkUpdatesButton"
+                            enabled: !updateBridge.checking
+                            variant: "outlined"
+                            text: strings.update.checkNow
+                            onClicked: updateBridge.checkNow()
+                        }
+                    }
+                }
+
                 // ---- Tema ----
                 SettingsSection {
                     Layout.fillWidth: true

@@ -55,6 +55,14 @@ class TestSurumKaynaklari:
     def test_readme_rozeti_surumle_ayni(self):
         assert f"badge/Version-{__version__}-orange" in read("README.md")
 
+    def test_readme_gizlilik_aciklamasi_ve_kapatma_yolu_var(self):
+        readme = read("README.md")
+        assert "## Gizlilik" in readme and "NAMAZ_TAKIP_NO_UPDATE_CHECK" in readme
+        assert "Açılışta güncellemeyi denetle" in readme  # Ayarlar'daki gerçek anahtar adıyla aynı
+        from app.core.strings import UpdateStrings
+
+        assert UpdateStrings.CHECK_ON_START in readme
+
     def test_depo_adi_readmede_geciyor(self):
         assert RELEASE_REPO in read("README.md")
 
