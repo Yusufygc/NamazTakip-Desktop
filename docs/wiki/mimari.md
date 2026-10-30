@@ -13,7 +13,7 @@ Yığın ve katman kuralları. Alan mantığı: [[vakit-hesabi]], [[takip-gunu-v
 | Bildirim | `SystemTrayIcon.showMessage()` | [[bildirim-ve-tepsi]]; Windows'ta davranış doğrulanmadı |
 | Zamanlayıcı | `QTimer` | Tek 1 sn'lik saat servisi |
 | Test | `pytest` | [[test-stratejisi]] |
-| Paketleme | PyInstaller tek dosya `--onefile` (yerel, kişisel kullanım) | [[dagitim]] |
+| Paketleme | PyInstaller `--onedir` kararlı exe + Inno Setup kurulum dosyası; isteğe bağlı taşınabilir `--onefile` | [[dagitim]] |
 
 Python 3.10.11, proje kökünde `venv/`. Bağımlılıklar üç dosyada tam sürümle sabit: `requirements.txt` (PySide6 6.11.0 ve eklentileri, shiboken6, adhanpy 1.0.5), `requirements-dev.txt` (pytest 9.2.0, ruff 0.17.3), `requirements-build.txt` (pyinstaller 6.22.3). Kurulum ve `pip check` temiz (2026-10-29). Ayrıntı: [[altyapi-kontrol-listesi]].
 

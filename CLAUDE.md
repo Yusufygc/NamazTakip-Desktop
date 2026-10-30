@@ -61,7 +61,8 @@ python main.py                          # çalıştır
 python -m pytest                        # test
 python -m ruff check .                  # lint
 pip install -r requirements-build.txt   # exe derleme bağımlılığı (PyInstaller)
-python tools/build_exe.py               # dist/NamazTakip.exe (tek dosya)
+python build_installer.py               # kararlı exe + kurulum dosyası (dist/installer/)
+python tools/build_onefile.py           # isteğe bağlı: taşınabilir tek dosya exe
 ```
 
 İlgili: `docs/wiki/index.md`

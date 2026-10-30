@@ -8,7 +8,7 @@ from pathlib import Path
 
 import pytest
 
-from tools import build_exe
+from tools import build_onefile as build_exe
 
 # QML'in ve çekirdeğin kullandığı Qt parçaları: hiçbir koşulda süzülmemeli/dışlanmamalı.
 NEEDED_MODULES = ("QtCore", "QtGui", "QtQml", "QtQuick", "QtNetwork", "QtWidgets")

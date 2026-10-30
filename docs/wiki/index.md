@@ -19,7 +19,7 @@ Namaz Takip Masaüstü (Windows, Python + PySide6/QML + SQLite) için bilgi taba
 
 - [[ekranlar]] — Vakitler, Kaza, Ayarlar, şehir seçici, temalar, metinler.
 - [[bildirim-ve-tepsi]] — Saat servisi, bildirim, tepsi, pencere, autostart, tek örnek.
-- [[dagitim]] — PyInstaller tek dosya exe ile yerel paketleme, elle kontrol.
+- [[dagitim]] — Kararlı exe, Inno Setup kurulum dosyası, onay kapısı, derleme sonrası deneme; Release ve güncelleme planı.
 
 ## Kalite ve süreç
 

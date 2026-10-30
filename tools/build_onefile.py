@@ -1,8 +1,12 @@
-"""Namaz Takip'i PyInstaller ile tek dosyalı exe olarak paketler (`--onefile`).
+"""Namaz Takip'i PyInstaller ile TAŞINABİLİR tek dosyalı exe olarak paketler (`--onefile`).
 
-Kullanım (proje kökünden, venv içinde):  python tools/build_exe.py [--keep-build]
-Çıktı: dist/NamazTakip.exe (tek dosya; istenen klasöre kopyalanıp oradan çalıştırılır).
-Ayrıntı: docs/wiki/dagitim.md.
+Bu, kurulum dosyasının (build_installer.py) yanında isteğe bağlı bir seçenektir: kararlı exe DEĞİLDİR
+(kod exe'nin içine gömülür, her sürümde özet değişir; Windows Akıllı Uygulama Denetimi her sürümü yeniden
+değerlendirir) ve onay kapısından geçmez. Dağıtım yolu `python build_installer.py`'dir (docs/wiki/dagitim.md).
+
+Kullanım (proje kökünden, venv içinde):  python tools/build_onefile.py [--keep-build]
+Çıktı: dist/portable/NamazTakip.exe (tek dosya; istenen klasöre kopyalanıp oradan çalıştırılır).
+`is_unused` ve `EXCLUDED_MODULES` kararlı derleme tarafından da kullanılır (build_exe.py).
 """
 
 import argparse
@@ -17,7 +21,7 @@ sys.path.insert(0, str(ROOT))
 from app.version import APP_NAME, __version__  # noqa: E402
 
 EXE_NAME = "NamazTakip"
-DIST = ROOT / "dist"
+DIST = ROOT / "dist" / "portable"
 WORK = ROOT / "build"
 
 # Uygulamanın kullanmadığı büyük Qt modülleri paketten çıkarılır (boyut). QML'in kullandığı modüller
@@ -94,7 +98,7 @@ SPEC_TEMPLATE = '''\
 import sys
 
 sys.path.insert(0, {root!r})
-from tools.build_exe import is_unused
+from tools.build_onefile import is_unused
 
 analysis = Analysis(
     [{main!r}],
@@ -157,7 +161,6 @@ def main() -> int:
     parser.add_argument("--keep-build", action="store_true", help="build/ ara klasörünü silme")
     args = parser.parse_args()
 
-    shutil.rmtree(DIST / EXE_NAME, ignore_errors=True)  # eski klasör (onedir) çıktısı
     result = subprocess.run(build_command(write_spec()), cwd=str(ROOT), check=False)
     if result.returncode != 0:
         print("PyInstaller başarısız oldu.", file=sys.stderr)

@@ -73,7 +73,7 @@ Uygulamayı silmek verilerinizi silmez. Yedeği geri yüklemek için uygulamayı
 
 ## Kurulum
 
-Henüz hazır bir kurulum dosyası yayınlanmıyor; uygulamayı kaynaktan çalıştırabilir veya tek dosya `exe` üretebilirsiniz. Gereken: **Windows** ve **Python 3.10**.
+Henüz GitHub'da hazır bir kurulum dosyası yayınlanmıyor; uygulamayı kaynaktan çalıştırabilir veya kurulum dosyasını kendiniz üretebilirsiniz. Gereken: **Windows** ve **Python 3.10**.
 
 ```powershell
 git clone https://github.com/Yusufygc/NamazTakip-Desktop.git
@@ -84,14 +84,18 @@ pip install -r requirements-dev.txt
 python main.py
 ```
 
-### Tek dosya exe üretme
+### Kurulum dosyası üretme
+
+Gereken: [Inno Setup 6](https://jrsoftware.org/isdl.php).
 
 ```powershell
 pip install -r requirements-build.txt
-python tools/build_exe.py
+python build_installer.py
 ```
 
-Çıktı `dist\NamazTakip.exe` olur (yaklaşık 56 MB). Tek dosyadır; istediğiniz klasöre kopyalayıp oradan çalıştırabilirsiniz. Her açılışta paket geçici klasöre açıldığı için pencere birkaç saniyede görünür. *Windows açılışında başlat* seçeneği exe'nin bulunduğu yolu kaydeder; exe'yi kalıcı bir klasöre koyun.
+Çıktı `dist\installer\NamazTakip-Setup-X.Y.Z.exe` olur (yaklaşık 37 MB). Çalıştırınca uygulama kullanıcıya özel kurulur (yönetici izni gerekmez), Başlat menüsüne eklenir; kaldırınca verileriniz silinmez. İçindeki `NamazTakip.exe` her sürümde bayt bayt aynıdır ("kararlı exe"): imzasız dosyaları sürüm sürüm yeniden değerlendiren Windows Akıllı Uygulama Denetimi'ne takılma riskini azaltır. Ayrıntı: [`docs/wiki/dagitim.md`](docs/wiki/dagitim.md).
+
+İsteğe bağlı taşınabilir tek dosya exe: `python tools/build_onefile.py` → `dist\portable\NamazTakip.exe` (her açılışta geçici klasöre açılır, pencere birkaç saniyede görünür; kararlı exe değildir).
 
 > İmzasız bir exe olduğundan Windows SmartScreen / Akıllı Uygulama Denetimi uyarı verebilir.
 
@@ -100,7 +104,7 @@ python tools/build_exe.py
 - **Vakit hesabı** [`adhanpy`](https://pypi.org/project/adhanpy/) ile yapılır, Diyanet kurallarına göre (yuvarlama ve Güneş için güvenlik payı dahil). Çıktılar, mobil uygulamanın ürettiği 1060 satırlık bir referans tabloyla saniyesine kadar karşılaştırılır (`tests/data/golden_times.json`).
 - **Kaza listesi saklanmaz, türetilir.** Her gün için beş vakit incelenir; kılınmamış veya işaretlenmemiş geçmiş vakitler kaza olur. İşaretlenmeyen bir günü sonradan düzeltmek listeyi kendiliğinden günceller.
 - **Katmanlı mimari.** `ui/qml → bridge → services → core/repositories → core/domain`; ters yön yasak ve testle denetlenir. İş kuralları Qt'den bağımsız saf Python'dur.
-- **Test.** 400'ü aşkın test: iş kuralları, SQLite, servisler, gerçek QML arayüzü (ekransız), kontrast (WCAG AA) ve mimari kuralları.
+- **Test.** 460'ı aşkın test: iş kuralları, SQLite, servisler, gerçek QML arayüzü (ekransız), kontrast (WCAG AA) ve mimari kuralları.
 
 Ayrıntılı proje bilgisi [`docs/wiki/`](docs/wiki/index.md) altındadır: mimari, vakit hesabı, kaza kuralları, veri katmanı, bildirim/tepsi, dağıtım ve alınan kararlar.
 
@@ -111,7 +115,7 @@ venv\Scripts\activate
 python main.py                # çalıştır
 python -m pytest              # testler
 python -m ruff check .        # lint
-python tools/build_exe.py     # exe derle
+python build_installer.py     # kurulum dosyası üret
 ```
 
 | Klasör | İçerik |
@@ -122,7 +126,8 @@ python tools/build_exe.py     # exe derle
 | `app/bridge/` | Python ↔ QML köprüleri |
 | `app/ui/qml/` | Arayüz (sayfalar, bileşenler, temalar) |
 | `tests/` | Testler |
-| `tools/` | Simge üretimi, exe derleme betiği |
+| `packaging/` | Kurulum betiği (Inno), sabit giriş betiği, onaylı exe özeti |
+| `tools/` | Simge üretimi, taşınabilir exe betiği |
 | `docs/wiki/` | Proje bilgi tabanı |
 
 ## Sınırlar
@@ -134,4 +139,8 @@ python tools/build_exe.py     # exe derle
 
 ## Kullanılan kütüphaneler
 
-[PySide6](https://doc.qt.io/qtforpython-6/) (Qt, LGPL), [adhanpy](https://pypi.org/project/adhanpy/), [PyInstaller](https://pyinstaller.org/), pytest ve ruff.
+[PySide6](https://doc.qt.io/qtforpython-6/) (Qt, LGPL), [adhanpy](https://pypi.org/project/adhanpy/), [PyInstaller](https://pyinstaller.org/), Inno Setup, pytest ve ruff. Üçüncü taraf lisanslar: [`THIRD_PARTY_NOTICES.md`](THIRD_PARTY_NOTICES.md).
+
+## Lisans
+
+Tüm hakları saklıdır ([`LICENSE`](LICENSE)). Kod görüntülenebilir, ancak yazılı izin olmadan kullanılamaz ve dağıtılamaz.

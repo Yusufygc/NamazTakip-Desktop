@@ -2,3 +2,4 @@
 
 __version__ = "0.1.0"
 APP_NAME = "Namaz Takip"
+RELEASE_REPO = "Yusufygc/NamazTakip-Desktop"  # GitHub Releases (yayın ve güncelleme denetimi)

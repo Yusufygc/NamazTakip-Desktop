@@ -1,63 +1,102 @@
 # Derleme ve Dağıtım
 
-Dağıtım biçimi **PyInstaller tek dosya** (`--onefile`): tek `NamazTakip.exe`, yanında `_internal` klasörü yok, istenen klasöre kopyalanıp oradan çalıştırılır ([[kararlar]] 27). Uygulamayı yalnızca geliştirici kendi bilgisayarında kullanır; GitHub'a yüklenmez, kurulum dosyası, CI, yayın ve otomatik güncelleme yoktur ([[kararlar]] 10). Altyapı kuralları: [[altyapi-kontrol-listesi]].
+Dağıtım biçimi **Inno Setup kurulum dosyası + kararlı exe** ([[kararlar]] 28). Kurulum dosyası `dist/installer/NamazTakip-Setup-X.Y.Z.exe`, içindeki exe her sürümde **bayt bayt aynıdır**; uygulama kodu exe'nin dışında (`_internal` altında `.pyc`) durur. Yöntemin gerekçesi, ölçümleri ve yapılmaması gerekenler genel rehberdedir: `C:\2UYGULAMALAR\D002-HazirPromptlar\Prod hazırlığı\exe-dagitim-rehberi.md` (bu sayfa onun Namaz Takip'e uyarlamasıdır). Altyapı kuralları: [[altyapi-kontrol-listesi]].
 
-## Derleme
+**Durum (2026-10-30):** Aşama 1 (kurulum + kararlı exe + kapı) tamam. Aşama 2 (etiketle GitHub Release hattı, CI) ve Aşama 3 (uygulama içi güncelleme) **yapılmadı** ([[yol-haritasi]]).
+
+## Komutlar
 
 ```powershell
 venv\Scripts\activate
 pip install -r requirements-build.txt
-python tools/build_exe.py            # --keep-build: build/ ara klasörünü silme
+python build_installer.py                      # exe + kapı + deneme + kurulum dosyası + .sha256
+python build_exe.py                            # yalnızca kararlı exe (dist/NamazTakip/) ve kapı
+python build_installer.py --update-launcher-hash   # exe'yi BİLEREK değiştirdiysen yeni özeti onayla
+python tools/build_onefile.py                  # isteğe bağlı: taşınabilir tek dosya exe (dist/portable/)
 ```
 
-`tools/build_exe.py` bir `build/NamazTakip.spec` üretir ve PyInstaller 6.22.3'ü onunla çağırır. Spec: `EXE` doğrudan ikili ve veri listelerini alır (`COLLECT` yok, bu yüzden tek dosya), pencereli (`console=False`), simge `app/ui/assets/app.ico`, `app/ui/qml` ve `app/ui/assets` veri olarak `app/ui/...` yoluna eklenir, kullanılmayan Qt modülleri dışlanır, kullanılmayan Qt parçaları `is_unused` ile süzülür. Çıktı: `dist/NamazTakip.exe` (`dist/` ve `build/` Git'e girmez). Süre yaklaşık 50 sn.
+Gereken: Python 3.10, `pyinstaller==6.22.3` (sabit), Inno Setup 6 (`ISCC.exe`; `ISCC` ortam değişkeni, PATH ve standart yollar aranır).
 
-**Boyut:** PyInstaller'ın Qt kancası `PySide6/qml` klasörünü ve bağlı DLL'leri bütün olarak toplar; ilk derleme **388 MB** çıktı (yalnızca `Qt6WebEngineCore.dll` ~200 MB). Betik kullanılmayan QML modül klasörlerini (Qt3D, Charts, WebEngine, Multimedia vb.), ilgili DLL'leri, `translations` ve `resources` klasörlerini pakete girmeden süzer: klasör çıktısında 141 MB, **tek dosyada 56 MB** (sıkıştırılmış). Silinenlerin hiçbiri uygulamada içe aktarılmaz; QML'in kullandığı modüller (Quick, Controls, Layouts, Shapes, `Qt.labs.platform`) ve `Qt6Network` korunur (testle sabitlendi: `tests/test_build_exe.py`). Çalışan exe QML'i yüklediği sürece eksik modül yoktur: `StackLayout` üç sayfayı da açılışta kurar.
+## Kararlı exe
 
-**Tek dosyanın bedeli:** her açılışta paket `%TEMP%\_MEI…` altına açılır. Bu makinede pencere ~3,4 sn'de görünür (soğuk ve sıcak aynı), ikinci başlatmanın "göster" isteği için çıkışı ~3 sn sürer. Windows açılışında başlatmada da aynı açılma süresi vardır. `kill` ile ölen sürecin geçici klasörünün kalıp kalmadığı **doğrulanmadı**. Tek dosyada exe, çalışırken iki süreç görünür (başlatıcı + uygulama); `Popen.kill()` yalnızca başlatıcıyı öldürüp uygulamayı yaşattı (Görev Yöneticisi'nde "Görevi sonlandır" için **doğrulanmadı**); tepsiden **Çıkış** ikisini de kapatır. Bu sorunlar ve antivirüs/SmartScreen'in tek dosyaya daha şüpheli bakması sakıncalı olursa `--onedir`'e dönülür ([[kararlar]] 27).
+Windows 11 Akıllı Uygulama Denetimi (SAC), imzasız her exe'yi **dosya özetine** göre bulut kararına bırakır; karar dosya başına ve öngörülemezdir. Her sürümde yeni exe özeti, kurulan yeni exe'nin engellenmesi demektir. Çözüm: exe'yi sürümler arasında değiştirmemek. Dört parça (biri eksikse özet değişir):
 
-Notlar:
+| Parça | Dosya / ayar |
+|---|---|
+| Sabit giriş betiği | `packaging/launcher.py` (`from main import main; raise SystemExit(main())`). **Değiştirme.** |
+| Modüller exe dışında | `--debug=noarchive` (`.pyc` dosyaları `_internal` altında) |
+| Sabit zaman damgası | `SOURCE_DATE_EPOCH = 1700000000` (`build_exe.LAUNCHER_EPOCH`) |
+| Sabit PE sürüm kaynağı | `packaging/launcher_version_info.txt` (sabit `1.0.0.0`) |
 
-- Tek dosya: kullanıcı isteği (klasör değil, tek exe). Qt'nin yeniden bağlanabilirliği (LGPL) için `--onedir` daha uygundu; kişisel kullanımda dağıtım olmadığından bu kaygı şimdilik geçerli değil, dağıtılırsa yeniden değerlendirilir ([[altyapi-kontrol-listesi]]).
-- Pencereli (konsolsuz) exe: `--windowed`. Konsol olmadığı için dosyaya loglama şarttır.
-- QML dosyaları ve simgeler pakete veri olarak eklenir; `main.py` frozen durumda `sys._MEIPASS` kullanır (P012 `main.py` deseni).
-- Sürüm tek kaynaktan: `app/version.py`.
+Ürün sürümü başka yerde görünür: kurulum dosyası adı, "Uygulamalar ve özellikler" kaydı ve uygulama. **Bedel:** Gezgin'de exe → Özellikler hep `1.0.0.0` gösterir. Özet ayrıca PyInstaller ve Python sürümüne, simgeye ve ada bağlıdır; bu yüzden PyInstaller sabitlenmiştir. `.gitattributes` `eol=lf` içerir (giriş betiği her makinede aynı derlenmeli).
 
-Boyut: Qt yüzünden yüzlerce MB olur (P012'nin `dist` klasörü, kurulum dosyası dahil, yaklaşık 490 MB). Kullanım: `dist\...\NamazTakip.exe` doğrudan çalıştırılır veya kısayol oluşturulur. Windows açılışında başlatma kullanılırsa kayıt, klasör taşınınca bozulur ([[bildirim-ve-tepsi]]); exe'yi kalıcı bir klasöre koyun.
+**Onay kapısı:** `packaging/launcher.sha256` Windows'ta denenmiş exe özetini tutar. `build_exe.py` derlemeden sonra özeti karşılaştırır; farklıysa **derleme ve yayın durur**. Bilerek değiştirmek için: exe'yi yerelde derle, `build_verify.launch_check` ile bu makinede aç, engellenirse **yalnızca** `LAUNCHER_EPOCH` değerini değiştirip yeniden dene, açılınca `--update-launcher-hash` ile onayla, testlerdeki sabit özetleri ve `LAUNCHER_EPOCH` değerini güncelle.
 
-## Doğrulama (Faz 8, 2026-10-30, gerçek Windows)
+**Referans uygulama:** rehberlerin gerçekleştirmesi `C:UYGULAMALAR\P020-Zipper\gitclean-archiver-pro` (GitClean Archiver; `P012-focustracker` aynı kalıbın PySide6 ikizi). Buradaki betikler ikisinden uyarlandı; GitClean'den alınan ek: bildirim üreticisi ve depo tutarlılık testleri. Alınmayanlar: kurulum sihirbazı görselleri (`wizard_*.bmp`, yalnızca görünüm) ve `AppUserModelID` (görev çubuğu sabitlemesi; Qt tepsi balonu için gerekmediği düşünülüyor, **doğrulanmadı**).
 
-Paketlenmiş tek dosya `NamazTakip.exe` (**proje dışında, başka bir klasöre kopyalanıp** oradan çalıştırıldı), izole veri klasörüyle. İlk tur klasör (`--onedir`) çıktısıyla, ikinci tur tek dosyayla yapıldı; aşağıdaki sonuçlar tek dosya içindir:
+Onaylı özet: `ed66570c689362cf…` (bkz. `packaging/launcher.sha256`).
+
+### Bu makinede doğrulananlar (2026-10-30)
 
 | Denenen | Sonuç |
 |---|---|
-| Exe açılır, tek görünür pencere, ilk açılışta şehir seçici | **Doğrulandı** (ekran görüntüsü) |
-| Şehir seçili veriyle Vakitler sayfası (geri sayım, vakitler, kenar çubuğu, simgeler) | **Doğrulandı** (ekran görüntüsü) |
-| Log'da `ERROR`/`Traceback` yok; veritabanı ve günlük yedek oluşur | **Doğrulandı** |
-| İkinci exe çıkar (tek dosyada ~3 sn, paketin açılması dahil), çalışan örnek "göster" isteğini alır | **Doğrulandı** |
-| `--autostart` ile açılınca pencere görünmez (tepside) | **Doğrulandı** |
-| Ayar açıkken açılışta `HKCU\...\Run` değeri `"<exe>" --autostart` yazılır (donmuş exe yolu) | **Doğrulandı** (değer sonra silindi, kayıt öncesi haline döndü) |
-| Kaza ve Ayarlar sayfalarının exe içinde görsel kontrolü | **Doğrulanmadı** (sayfalar açılışta yüklenir ve QML hatası yok, ama klavye kısayoluyla gezinti ekran görüntüsünde çalışmadı) |
-| Toast'ın ekranda görünmesi ve tıklanması | **Doğrulanmadı** |
-| SmartScreen / Akıllı Uygulama Denetimi, başka bir klasöre veya bilgisayara taşıma, DPI %150/%200, uykudan dönüş | **Doğrulanmadı** |
+| Aynı kaynaktan yeniden derleme | Aynı özet |
+| Uygulama koduna satır ekleyip yeniden derleme (`app/version.py`) | **Aynı özet** (kararlı exe çalışıyor) |
+| `build_verify.launch_check`: exe yalıtılmış veri klasörüyle 8 sn çalıştı, kapatıldı | Geçti |
+| `build_installer.py` tam akış: derle → kapı → exe denemesi → Inno → sessiz kurulum → kurulan exe denemesi → kaldırıcı | Geçti; kurulum dosyası **36,7 MB**; gerçek kayıt ve Başlat kısayolu etkilenmedi (deneme sonrası ikisi de yok/aynı) |
+| Satır sonları | Giriş betiği ve sürüm kaynağı LF (`tests/test_release_packaging.py` özetlerini sabitler) |
 
-Test notu: venv başlatıcısı (`python.exe`) ve tek dosyalı exe'nin başlatıcısı alt süreç açtığından `Popen.kill()` yalnızca başlatıcıyı öldürür (tek dosyada `taskkill /F /T` gerekir); alt süreç tek örnek adlı borusunu tutmaya devam eder ve sonraki denemelerde "ikinci örnek" yanlışlıkla eski sürece bağlanır (yanlış alarm: tek örnek bozuk görünür). Denemeler arasında kalan `main.py` süreçleri temizlenir. Boru adı sabittir ([[bildirim-ve-tepsi]]), gerçek kullanımda tek veri klasörü olduğundan sorun değildir.
+### Doğrulanmadı
+
+- **SAC bu makinede kapalı** (`VerifiedAndReputablePolicyState` = 0). Bu yüzden "exe engellenmedi" denemesi SAC açısından bir şey kanıtlamaz; yalnızca exe'nin açıldığını gösterir. SAC'ın gerçek etkisi SAC'lı bir makinede denenmeli.
+- Farklı kök klasörde derleme (CI'a benzetmek için) ve **CI'da derlenen exe'nin yerel özetle aynı çıkması** (Aşama 2'de kapıyla sınanır).
+- İndirilmiş (MOTW'li) kurulum dosyasının başka bir bilgisayarda açılması.
+- Kurulu uygulamanın Başlat menüsünden açılışı (kurulum dosyası sessiz kurulup kaldırılarak denendi, elle kullanıcı akışı değil).
+
+## Kurulum sihirbazı (Inno Setup 6)
+
+`packaging/NamazTakip.iss`. Önemli ayarlar:
+
+- `AppId` **sabit** (`{6E2B7C1D-8A44-4F3E-9B05-3D7C5A1E94F2}`): değişirse sonraki sürüm üstüne yazmaz, ikinci kurulum olur. `build_verify.UNINSTALL_KEY` aynı GUID'i taşır (testle bağlı).
+- `PrivilegesRequired=lowest` (+ `OverridesAllowed=dialog`): UAC sormaz, varsayılan `%LOCALAPPDATA%\Programs\Namaz Takip`; güncelleme ve derleme sonrası deneme sessiz çalışır.
+- `CloseApplications=yes`, `RestartApplications=no`; yeniden açmayı `[Run]` yapar: `/SILENT` (uygulama içi güncelleme) kurulumdan sonra uygulamayı açar, `/VERYSILENT` (deneme) açmaz (`Check: RelaunchAfterUpdate`).
+- Türkçe ve İngilizce sihirbaz; masaüstü kısayolu isteğe bağlı (varsayılan kapalı); Başlat menüsü kısayolu.
+- `LICENSE` ve `THIRD_PARTY_NOTICES.md` kurulumla birlikte dağıtılır. Kullanıcı verisi (`%APPDATA%\NamazTakip\`) kaldırıcı tarafından **silinmez**.
+- Çıktı: `NamazTakip-Setup-X.Y.Z.exe`; `build_installer.py` yanına `.sha256` yazar (güncelleyici bu desene ve özete bakacak, Aşama 3).
+
+## Derleme sonrası deneme (`build_verify.py`)
+
+- `launch_check(exe)`: exe başlatılır, süre sonunda çalışıyorsa `taskkill /T /F` ile kapatılır; `WinError 4551/1260` engel sayılır. Deneme uygulaması **yalıtılmış veri klasörüyle** (`NAMAZ_TAKIP_DATA_DIR`) açılır: gerçek veritabanına, yedeklere, tek örnek kilidine ve açılış kaydına dokunmaz; deneme verisi silinir.
+- `installer_check(kurulum)`: geçici klasöre sessizce kurar, kurulan exe'yi dener, **kaldırıcıyı da çalıştırır** (kaldırıcı da imzasız exe'dir).
+- **Gerçek kurulumu koruma:** deneme kurulumu gerçek kurulumla aynı `AppId`'yi yazar; deneme öncesi "Uygulamalar ve özellikler" kaydı ve Başlat kısayolu yedeklenir, `try/finally` ile her durumda geri yazılır (`save_registration` / `restore_registration`; testler geçici HKCU alt anahtarı kullanır).
+- CI'da (`CI` ortam değişkeni) ve `--no-verify` ile deneme atlanır.
+
+## Boyut
+
+PyInstaller'ın Qt kancası `PySide6/qml` klasörünü ve bağlı DLL'leri bütün toplar (ilk denemede klasör **388 MB**, yalnızca `Qt6WebEngineCore.dll` ~200 MB). `build_exe.prune` kullanılmayan QML modül klasörlerini, DLL'leri, `translations` ve `resources` klasörlerini derlemeden sonra siler (**148 MB** klasör, **36,7 MB** kurulum dosyası). Bu **exe dosyasını değiştirmez** (özet yalnızca exe'dendir). Silinen listesi `tools/build_onefile.py` içindeki `is_unused`/`EXCLUDED_MODULES`; QML'in kullandığı modüller (Quick, Controls, Layouts, Shapes, `Qt.labs.platform`) ve `Qt6Network` korunur, testle sabitlendi ([[kararlar]] 26).
+
+## Taşınabilir tek dosya (isteğe bağlı)
+
+`python tools/build_onefile.py` → `dist/portable/NamazTakip.exe` (56 MB). Kullanıcı isteğiyle eklendi ([[kararlar]] 27), ama **kararlı exe değildir**: kod exe'nin içine gömülür, her derlemede özet değişir, SAC her derlemeyi yeniden değerlendirir; onay kapısından geçmez. Her açılışta `%TEMP%`'e açılır (pencere ~3,4 sn). `Popen.kill()` yalnızca başlatıcıyı öldürür, uygulama yaşar. Dağıtım için kullanılmaz; kurulum dosyası esastır.
 
 ## Kimlik ve simge
 
-`app/ui/assets/app.ico` (16–256 px, çok boyutlu) ve `tray.png` `tools/make_icons.py` ile üretilir ve depoda tutulur; PyInstaller'a `--icon app/ui/assets/app.ico` ve `app/ui/assets` veri klasörü olarak verilir (`tools/build_exe.py`). Autostart kaydı yalnızca donmuş exe'de yazılır; bu yüzden exe'yi kalıcı bir klasöre koyun ve ilk çalıştırmada "Evet, başlasın" deyin (kayıt her açılışta yeniden eşitlenir).
+`app/ui/assets/app.ico` (16–256 px) ve `tray.png` `tools/make_icons.py` ile üretilir ve depoda tutulur. Autostart kaydı yalnızca donmuş exe'de yazılır ([[bildirim-ve-tepsi]]): kurulu yola işaret eder; uygulama içi güncelleme exe yolunu değiştirmez, bu yüzden kayıt bozulmaz.
 
+## Lisans ve bildirimler
 
-Uygulama simgesi çok boyutlu `.ico` (16–256); tepsi simgesi ayrı küçük `.ico`. Kod imzalama yok; kişisel kullanım için bilinçli karar. Windows 11'de Akıllı Uygulama Denetimi (SAC) veya SmartScreen imzasız exe'yi engelleyebilir; bu proje için henüz denenmedi (**doğrulanmadı**). Engelleme çıkarsa P012'deki "kararlı exe" yöntemi referanstır: `C:\2UYGULAMALAR\P012-focustracker\docs\wiki\exe-dagitim-rehberi.md`.
+`THIRD_PARTY_NOTICES.md` elle yazılmaz: `python tools/third_party_notices.py` üretir (kurulu paketlerin `dist-info` lisans metinlerinden; MIT bileşen adhanpy'nin tam metni gömülüdür, LGPL bileşenlerde resmî adres ve kaynak adresi yazılır) ve `tests/test_release_packaging.py` dosyanın üretimle birebir aynı olduğunu ve her bağımlılığın kurulu sürümle `requirements*.txt` pininin eşleştiğini denetler.
 
-## İleride gerekirse
+`LICENSE`: **tüm hakları saklı** (kullanıcı kararı; depo public olduğundan GitHub'ın izin verdiği görüntüleme ve çatallama dışında kullanım hakkı vermez). `THIRD_PARTY_NOTICES.md`: PySide6/Qt (LGPL-3.0), adhanpy (MIT), PyInstaller (GPL-2.0-or-later, önyükleyici istisnasıyla), Python (PSF). Qt DLL olarak dinamik bağlanır (`--onedir`), LGPL açısından değiştirilebilir.
 
-Kurulum dosyası (Inno Setup: `P012-focustracker\installer.iss`), GitHub yayını ve güncelleme sistemi bu projede **yoktur**; ihtiyaç doğarsa P012 hattı örnek alınır, karar [[kararlar]]'a yazılır.
+SmartScreen / Akıllı Uygulama Denetimi imzasız dosyayı engelleyebilir. Kod imzalama yok; kişisel kullanım için bilinçli karar.
 
 ## Elle kontrol (her yeni derlemede, gerçek Windows)
 
-İlk açılışta şehir seçici gelir; şehir seçilince vakitler mobille aynıdır ([[vakit-hesabi]] doğrulama tablosu); işaretleme kaza listesini günceller; kapat düğmesi tepsiye küçültür; tepsiden "Çıkış" gerçekten kapatır; bildirim vakitte gelir ve tıklanınca pencere açılır; yeniden açılışta işaretler ve ayarlar durur; autostart açıkken yeniden başlatmada uygulama tepside açılır; DPI %100/%150/%200; uykudan dönüş. Ayrıntı: [[test-stratejisi]].
+İlk açılışta şehir seçici gelir; şehir seçilince vakitler mobille aynıdır ([[vakit-hesabi]]); işaretleme kaza listesini günceller; kapat düğmesi tepsiye küçültür; tepsiden "Çıkış" gerçekten kapatır; bildirim vakitte gelir ve tıklanınca pencere açılır; yeniden açılışta işaretler ve ayarlar durur; autostart açıkken yeniden başlatmada uygulama tepside açılır; DPI %100/%150/%200; uykudan dönüş. Ayrıntı: [[test-stratejisi]].
+
+Önceki tek dosya denemesinin sonuçları (Faz 8): pencere, şehirli Vakitler görünümü, tek örnek, `--autostart` gizli başlatma ve donmuş exe için `Run` kaydı doğrulandı; Kaza/Ayarlar sayfalarının görsel kontrolü, toast görünümü ve tıklama, SmartScreen ve DPI **doğrulanmadı**. Aynı denemeler kurulu (kararlı) exe ile tekrarlanmadı.
 
 ## Kullanıcı verisi
 
-Veri `%APPDATA%\NamazTakip\` altındadır; exe klasörünü silmek veriyi silmez ([[veri-katmani]]).
+Veri `%APPDATA%\NamazTakip\` altındadır; uygulamayı kaldırmak veriyi silmez ([[veri-katmani]]).
