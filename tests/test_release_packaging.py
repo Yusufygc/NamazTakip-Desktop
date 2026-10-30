@@ -198,10 +198,11 @@ class TestSurumVeLisans:
             installed = importlib.metadata.version(package)
             assert installed == pinned[package.lower()], f"{package}: kurulu {installed}, requirements {pinned[package.lower()]}"
 
-    def test_mit_bilesenin_lisans_metni_gomulu(self):
+    def test_adhanpy_bildirimde_lisans_adiyla_listelenir(self):
+        """Kullanıcı kararı: MIT metni gömülmez; bileşen adı, sürümü, lisansı ve kaynağı listelenir."""
         notices = (ROOT / "THIRD_PARTY_NOTICES.md").read_text(encoding="utf-8")
-        assert "Permission is hereby granted, free of charge" in notices
-        assert "Copyright (c) 2022 alphahm" in notices
+        assert "### adhanpy 1.0.5" in notices and "- Lisans: MIT" in notices
+        assert "Permission is hereby granted" not in notices
 
     def test_surum_baska_yerde_sabit_yazilmamis(self):
         """Sürüm tek kaynaktan gelir (app/version.py); kodda ve arayüzde ikinci bir yazım olmamalı."""

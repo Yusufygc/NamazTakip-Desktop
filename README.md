@@ -1,5 +1,7 @@
 # Namaz Takip Masaüstü
 
+![Sürüm](https://img.shields.io/badge/Version-0.1.0-orange) ![Platform](https://img.shields.io/badge/Platform-Windows-blue)
+
 Ezan vakitlerini gösteren, kıldığınız namazları işaretlemenizi sağlayan ve kaza borcunuzu takip eden sade bir **Windows masaüstü uygulaması**. Bilgisayarınız açıkken sistem tepsisinde sessizce çalışır; vakit girmeden haber verir, vakit girince bildirim gösterir.
 
 Python + PySide6 (QML) + SQLite ile yazıldı. Verileriniz yalnızca kendi bilgisayarınızda durur; hesap, internet bağlantısı ya da sunucu gerekmez.

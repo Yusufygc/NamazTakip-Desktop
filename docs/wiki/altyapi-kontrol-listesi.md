@@ -49,9 +49,9 @@ filterwarnings =
 
 CI'da `PYTHONWARNDEFAULTENCODING=1`; kodlamasız dosya açan kod hataya döner. `tests/conftest.py` autouse fixture'ı **kullanıcı verisini yalıtır**: veritabanı yolu, günlük yedek klasörü, log klasörü, ayar yolu `tmp_path_factory` altına yönlendirilir; testler gerçek `%APPDATA%\NamazTakip\` klasörüne yazmaz. Yeni bir kalıcılık noktası eklenince yalıtım fixture'ı aynı anda eklenir. Ekransız QML için `QT_QPA_PLATFORM=offscreen` ve `QT_QPA_FONTDIR=C:/Windows/Fonts` `conftest.py`'da `setdefault` ile ayarlanır. Bekçi testleri ve senaryolar: [[test-stratejisi]].
 
-## CI (şimdilik yok)
+## CI
 
-GitHub kullanılmayacağı için ([[kararlar]] 10) CI şimdilik yok. Aynı kapı yerelde elle koşulur: `python -m ruff check .` → `python -m pytest -q` (`PYTHONWARNDEFAULTENCODING=1`) → isteğe bağlı `pip-audit -r requirements.txt`. GitHub'a geçilirse P012'deki `.github/workflows/tests.yml` başlangıç noktasıdır (hedef platform `windows-latest`, izin `contents: read`). Yerel git deposu kuruldu (`git init`, dal `main`); `venv/` `.gitignore`'da. Commit yalnızca kullanıcı "commit at" deyince ([[calisma-duzeni]]).
+CI yazıldı ([[kararlar]] 28; `.github/workflows/ci.yml`, ayrıntı [[dagitim]]) ama GitHub'da henüz koşmadı. Aynı kapı yerelde elle de koşulur: `python -m ruff check .` → `python -m pytest -q` (`PYTHONWARNDEFAULTENCODING=1`) → isteğe bağlı `pip-audit -r requirements.txt`. GitHub'a geçilirse P012'deki `.github/workflows/tests.yml` başlangıç noktasıdır (hedef platform `windows-latest`, izin `contents: read`). Yerel git deposu kuruldu (`git init`, dal `main`); `venv/` `.gitignore`'da. Commit yalnızca kullanıcı "commit at" deyince ([[calisma-duzeni]]).
 
 ## Loglama ve hata
 

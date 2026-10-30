@@ -63,6 +63,7 @@ python -m ruff check .                  # lint
 pip install -r requirements-build.txt   # exe derleme bağımlılığı (PyInstaller)
 python build_installer.py               # kararlı exe + kurulum dosyası (dist/installer/)
 python tools/build_onefile.py           # isteğe bağlı: taşınabilir tek dosya exe
+python tools/release.py X.Y.Z           # sürüm yükselt + commit + etiket (itmez; etiket yalnızca açık istekle itilir)
 ```
 
 İlgili: `docs/wiki/index.md`

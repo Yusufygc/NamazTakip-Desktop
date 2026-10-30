@@ -2,7 +2,7 @@
 
 Dağıtım biçimi **Inno Setup kurulum dosyası + kararlı exe** ([[kararlar]] 28). Kurulum dosyası `dist/installer/NamazTakip-Setup-X.Y.Z.exe`, içindeki exe her sürümde **bayt bayt aynıdır**; uygulama kodu exe'nin dışında (`_internal` altında `.pyc`) durur. Yöntemin gerekçesi, ölçümleri ve yapılmaması gerekenler genel rehberdedir: `C:\2UYGULAMALAR\D002-HazirPromptlar\Prod hazırlığı\exe-dagitim-rehberi.md` (bu sayfa onun Namaz Takip'e uyarlamasıdır). Altyapı kuralları: [[altyapi-kontrol-listesi]].
 
-**Durum (2026-10-30):** Aşama 1 (kurulum + kararlı exe + kapı) tamam. Aşama 2 (etiketle GitHub Release hattı, CI) ve Aşama 3 (uygulama içi güncelleme) **yapılmadı** ([[yol-haritasi]]).
+**Durum (2026-10-30):** Aşama 1 (kurulum + kararlı exe + kapı) ve Aşama 2 (`tools/release.py`, `ci.yml`, `release.yml`) yazıldı ve yerelde sınandı; **iş akışları GitHub'da henüz hiç koşmadı**. Aşama 3 (uygulama içi güncelleme) **yapılmadı** ([[yol-haritasi]]).
 
 ## Komutlar
 
@@ -48,10 +48,21 @@ Onaylı özet: `ed66570c689362cf…` (bkz. `packaging/launcher.sha256`).
 
 ### Doğrulanmadı
 
+- **İş akışları GitHub'da hiç koşmadı** (yalnızca YAML sözdizimi ayrıştırıldı ve metin testleri geçti). `windows-latest` üzerinde kurulumlar, offscreen QML testleri, `choco install innosetup`, `pip-audit` sonucu ve `gh release create` bilinmiyor. İlk push'ta `ci.yml` koşacak; `release.yml` yalnızca etiketle.
 - **SAC bu makinede kapalı** (`VerifiedAndReputablePolicyState` = 0). Bu yüzden "exe engellenmedi" denemesi SAC açısından bir şey kanıtlamaz; yalnızca exe'nin açıldığını gösterir. SAC'ın gerçek etkisi SAC'lı bir makinede denenmeli.
 - Farklı kök klasörde derleme (CI'a benzetmek için) ve **CI'da derlenen exe'nin yerel özetle aynı çıkması** (Aşama 2'de kapıyla sınanır).
 - İndirilmiş (MOTW'li) kurulum dosyasının başka bir bilgisayarda açılması.
 - Kurulu uygulamanın Başlat menüsünden açılışı (kurulum dosyası sessiz kurulup kaldırılarak denendi, elle kullanıcı akışı değil).
+
+## Sürüm numarası ve yayın (Aşama 2)
+
+- Biçim `MAJOR.MINOR.PATCH`, etiket `vX.Y.Z`. **Tek kaynak:** `app/version.py` (`__version__`, `RELEASE_REPO`); README sürüm rozeti `tools/release.py` ile aynı değere çekilir, elle düzenlenmez (test tutarlılığı denetler). Güncelleyici (Aşama 3) yalnızca üç sayılı biçimi tanıyacak ve sayısal karşılaştıracak (`0.10.0 > 0.9.0`); `-rc1` gibi ön sürümler yok sayılır. Artış: hata düzeltme → PATCH, yeni özellik → MINOR, geriye dönük uyumsuz veri/ayar değişikliği → MAJOR. exe'nin Windows sürüm kaynağı **bilerek yükseltilmez** (kararlı exe).
+- `python tools/release.py X.Y.Z`: sürümü yükseltir, `chore(release): vX.Y.Z` commit'i atar, ek açıklamalı `vX.Y.Z` etiketi oluşturur. **Hiçbir şey göndermez.** Önkoşullar: temiz çalışma ağacı, dal `main`, yeni sürüm mevcuttan büyük, etiket yok. `--dry-run` yalnızca gösterir; `--check-tag vX.Y.Z` etiketin sürümle uyumunu denetler (CI).
+- Gönderme **elle ve yalnızca açık istekle**: `git push origin main` sonra `git push origin vX.Y.Z` (`--follow-tags` kullanma: hafif etiketi göndermez). Yapay zekâ asistanları kullanıcının açık isteği olmadan etiket oluşturmaz ve itmez; yayın tüm kurulu kullanıcılara güncelleme penceresi çıkarır.
+- `.github/workflows/ci.yml` (her push ve PR): Windows, Python **3.10.11** (yerel venv ile aynı; exe özeti Python sürümüne bağlı), ruff, pytest (`QT_QPA_PLATFORM=offscreen`, `PYTHONWARNDEFAULTENCODING=1`), `pip-audit` (sürüm sabit). Ek iş **`exe-ozeti`** (PR hariç): `python build_exe.py` ile kararlı exe'yi CI'da derler ve özeti `packaging/launcher.sha256` ile karşılaştırır; farklıysa kırmızı. Etiket itmeden CI exe'sinin yerelle aynı olup olmadığını görmenin yolu budur.
+- `.github/workflows/release.yml` (`v*` etiketi itilince): sırayla etiket↔sürüm denetimi (etiket adı `env: TAG` ile geçer, kabuk koduna gömülmez), bağımlılıklar, ruff, pytest, Inno Setup (yoksa `choco`), `python build_installer.py` (CI'da deneme atlanır, kapı çalışır), `gh release create … --generate-notes --verify-tag` (`-` içeren etiket `--prerelease`; kurulum dosyası ve `.sha256` yüklenir). İzin: yalnızca `contents: write`. Sürüm notları commit mesajlarından üretilir; bu yüzden commit mesajları anlaşılır ve Türkçe yazılır.
+- Yayın kontrol listesi: CI yeşil ve `exe-ozeti` yeşil; `python tools/release.py X.Y.Z`; `git push origin main`; `git push origin vX.Y.Z`; Release iş akışı yeşil, günlükte "Kararlı exe özeti onaylananla aynı"; Release'te `NamazTakip-Setup-X.Y.Z.exe` ve `.sha256` var; **indirilen (MOTW'li) kurulum dosyası SAC'lı bir makinede denenir**.
+- Hata ve geri alma: etiket↔sürüm farklı, iş akışı durdu (yayın yok) → düzelt, commit et, etiketi taşı (`git tag -f`, `git push -f origin vX.Y.Z`). Yayın oluştu ama sürüm hatalı → **yayınlanmış etiketi taşıma**, yeni PATCH çıkar; acilse `gh release delete vX.Y.Z --cleanup-tag`.
 
 ## Kurulum sihirbazı (Inno Setup 6)
 
@@ -85,7 +96,7 @@ PyInstaller'ın Qt kancası `PySide6/qml` klasörünü ve bağlı DLL'leri büt�
 
 ## Lisans ve bildirimler
 
-`THIRD_PARTY_NOTICES.md` elle yazılmaz: `python tools/third_party_notices.py` üretir (kurulu paketlerin `dist-info` lisans metinlerinden; MIT bileşen adhanpy'nin tam metni gömülüdür, LGPL bileşenlerde resmî adres ve kaynak adresi yazılır) ve `tests/test_release_packaging.py` dosyanın üretimle birebir aynı olduğunu ve her bağımlılığın kurulu sürümle `requirements*.txt` pininin eşleştiğini denetler.
+`THIRD_PARTY_NOTICES.md` elle yazılmaz: `python tools/third_party_notices.py` üretir (kurulu paketlerin `dist-info` lisans metinlerinden; tüm bileşenlerde lisans adı, sürüm ve kaynak adresi yazılır; **MIT metni (adhanpy) kullanıcı kararıyla gömülmez**, bir daha eklenmez) ve `tests/test_release_packaging.py` dosyanın üretimle birebir aynı olduğunu ve her bağımlılığın kurulu sürümle `requirements*.txt` pininin eşleştiğini denetler.
 
 `LICENSE`: **tüm hakları saklı** (kullanıcı kararı; depo public olduğundan GitHub'ın izin verdiği görüntüleme ve çatallama dışında kullanım hakkı vermez). `THIRD_PARTY_NOTICES.md`: PySide6/Qt (LGPL-3.0), adhanpy (MIT), PyInstaller (GPL-2.0-or-later, önyükleyici istisnasıyla), Python (PSF). Qt DLL olarak dinamik bağlanır (`--onedir`), LGPL açısından değiştirilebilir.
 

@@ -1,0 +1,58 @@
+# Kalite kapısı: her push ve pull request'te lint, testler ve bağımlılık güvenlik taraması.
+# Windows: uygulama, tepsi ve dosya sistemi davranışı Windows'a göre sınanır.
+# `exe-ozeti` işi kararlı exe'nin CI'da da AYNI özeti verdiğini sınar (etiket itmeden): docs/wiki/dagitim.md
+name: CI
+
+on:
+  push:
+  pull_request:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  test:
+    runs-on: windows-latest
+    timeout-minutes: 20
+    env:
+      QT_QPA_PLATFORM: offscreen          # ekransız QML testleri
+      PYTHONIOENCODING: utf-8
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.10.11"       # yerel venv ile aynı (exe özeti Python sürümüne bağlıdır)
+          cache: pip
+          cache-dependency-path: requirements-dev.txt
+      - name: Bağımlılıklar
+        run: python -m pip install -r requirements-dev.txt
+      - name: Lint (ruff)
+        run: python -m ruff check .
+      - name: Testler
+        env:
+          PYTHONWARNDEFAULTENCODING: "1"  # kodlamasız dosya açan kod yerel ayara bağlı kalmasın (pytest.ini hataya çevirir)
+        run: python -m pytest -q
+      - name: Bağımlılık güvenlik taraması (pip-audit)
+        run: |
+          python -m pip install pip-audit==2.10.1
+          python -m pip_audit -r requirements.txt
+
+  exe-ozeti:
+    if: github.event_name != 'pull_request'
+    needs: test
+    runs-on: windows-latest
+    timeout-minutes: 30
+    env:
+      PYTHONIOENCODING: utf-8
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.10.11"
+          cache: pip
+          cache-dependency-path: requirements-build.txt
+      - name: Bağımlılıklar
+        run: python -m pip install -r requirements-build.txt
+      - name: Kararlı exe derle ve özeti onaylananla karşılaştır
+        run: python build_exe.py              # özet packaging/launcher.sha256 ile farklıysa kapı çıkış kodu 1 verir

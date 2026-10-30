@@ -21,7 +21,7 @@ COMPONENTS = {
     "PySide6-Essentials": ("LGPL-3.0-only (Qt for Python)", "https://pyside.org", False),
     "PySide6-Addons": ("LGPL-3.0-only (Qt for Python)", "https://pyside.org", False),
     "shiboken6": ("LGPL-3.0-only (Qt for Python)", "https://pyside.org", False),
-    "adhanpy": ("MIT", "https://github.com/alphahm/adhanpy", True),
+    "adhanpy": ("MIT", "https://github.com/alphahm/adhanpy", False),  # kullanıcı kararı: lisans metni gömülmez
 }
 
 HEADER = """# Üçüncü taraf bileşenler ve lisansları

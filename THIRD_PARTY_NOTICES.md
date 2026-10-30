@@ -44,4 +44,3 @@ modülleri (WebEngine, Qt3D, Charts, Multimedia vb.) paketten çıkarılır; kal
 
 - Lisans: MIT
 - Kaynak: <https://github.com/alphahm/adhanpy>
-
